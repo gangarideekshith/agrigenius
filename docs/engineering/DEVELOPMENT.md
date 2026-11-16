@@ -60,14 +60,28 @@ Consumed by `backend/src/main/resources/application.yml`, which imports the root
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT` | required (port 5432) | Database connection, shared with Docker Compose |
-| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD` | fall back to `localhost` / `POSTGRES_*` | Optional overrides for a different database or user |
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT` | required (port 5432) | Database and **schema owner**, shared with Docker Compose. Flyway connects as this owner to run migrations. |
+| `DB_USERNAME` | `agrigenius_app` | **Least-privilege role** the running backend connects as. Must differ from `POSTGRES_USER`. |
+| `DB_PASSWORD` | **required** | Password for `DB_USERNAME`: 16–128 characters of `A-Z a-z 0-9 + / = _ . -`. No longer falls back to `POSTGRES_PASSWORD`. Generate: `openssl rand -base64 24`. |
+| `DB_HOST`, `DB_PORT`, `DB_NAME` | `localhost` / `POSTGRES_PORT` / `POSTGRES_DB` | Optional overrides for a different database |
+| `DB_MANAGE_APP_ROLE` | `true` | When `true`, Flyway's `afterMigrate.sql` creates/updates the `DB_USERNAME` role and grants data-only access after every migration. Set `false` where roles are provisioned outside the app. |
+| `JWT_SECRET` | **required** | HS256 signing key: base64 of at least 32 random bytes. Startup fails if missing, short, not base64 or the placeholder. See below to generate. |
+| `JWT_ISSUER` | `agrigenius` | `iss` claim written and checked |
+| `JWT_ACCESS_TOKEN_MINUTES` | `30` | Access-token lifetime, 1–120 minutes |
+| `JWT_REFRESH_TOKEN_DAYS` | — | Unused until refresh tokens are implemented (deferred, D1) |
 | `SERVER_PORT` | `8080` | HTTP port |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:4200` | Comma-separated browser origins for `/api/**`; `*` is rejected |
 | `ML_SERVICE_BASE_URL` | `http://localhost:8001` | Private ML service; never sent to the browser |
 | `ML_SERVICE_CONNECT_TIMEOUT`, `ML_SERVICE_READ_TIMEOUT` | `2s`, `5s` | ML service HTTP timeouts |
 | `SPRING_PROFILES_ACTIVE` | none | **Not read from `.env`** (verified). Set it as a real environment variable or with `-Dspring-boot.run.profiles=local`. `local` enables Swagger UI; `prod` uses JSON logs. |
-| `JWT_*` | — | Not used yet (Milestone 2) |
+
+Generate `JWT_SECRET` (48 random bytes, base64):
+
+- Git Bash: `openssl rand -base64 48`
+- PowerShell 7: `[Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(48))`
+- Windows PowerShell 5.1: `[Convert]::ToBase64String((1..48 | ForEach-Object { Get-Random -Maximum 256 }))` works but `Get-Random` is **not** cryptographically secure; prefer one of the above.
+
+**Upgrading your local `.env` (Milestone 2).** Before starting the backend, add `JWT_SECRET`, `DB_USERNAME` (for example `agrigenius_app`) and `DB_PASSWORD` to the root `.env`. `DB_USERNAME` must not be the same as `POSTGRES_USER`. On the next start, Flyway (as `POSTGRES_USER`) creates the `DB_USERNAME` role with that password and grants it data-only access; the backend then connects as that role. Changing `DB_PASSWORD` later updates the role's password on the next start.
 
 ### ML service (`ml-service/.env.example`)
 

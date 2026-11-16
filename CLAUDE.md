@@ -85,7 +85,7 @@ Use a farmer-friendly, responsive, accessible design. Keep language simple, prov
 
 ## Testing expectations
 
-Backend: JUnit 5, Mockito and Spring Boot integration tests.
+Backend: JUnit 6 (via Spring Boot 4), Mockito and Spring Boot integration tests.
 Frontend: Angular component and service tests.
 API/security: validation, role access, ownership, auth lifecycle and upload validation.
 ML: preprocessing, inference contract, reproducibility and model metrics.

@@ -44,20 +44,22 @@ class ApplicationIntegrationTest implements PostgresTestcontainer {
     MlServiceClient mlServiceClient;
 
     @Test
-    void flywayAppliesV1AndPgvectorIsAvailable() {
-        Integer applied = jdbcTemplate.queryForObject(
-                "select count(*) from flyway_schema_history where version = '1' and success", Integer.class);
-        assertThat(applied).isEqualTo(1);
+    void flywayAppliesMigrationsAndPgvectorIsAvailable() {
+        java.util.List<String> applied = jdbcTemplate.queryForList(
+                "select version from flyway_schema_history where success and version is not null order by installed_rank",
+                String.class);
+        assertThat(applied).containsExactly("1", "2");
 
         String vectorVersion = jdbcTemplate.queryForObject(
                 "select extversion from pg_extension where extname = 'vector'", String.class);
         assertThat(vectorVersion).isEqualTo("0.8.7");
 
-        Integer appTables = jdbcTemplate.queryForObject("""
-                select count(*) from information_schema.tables
+        java.util.List<String> appTables = jdbcTemplate.queryForList("""
+                select table_name from information_schema.tables
                 where table_schema = 'public' and table_name <> 'flyway_schema_history'
-                """, Integer.class);
-        assertThat(appTables).as("foundation creates no application tables").isZero();
+                order by table_name
+                """, String.class);
+        assertThat(appTables).containsExactly("farmer_profiles", "users");
     }
 
     @Test
