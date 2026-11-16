@@ -31,3 +31,27 @@ Base path: `/api`. All authenticated endpoints must enforce role and resource ow
 - Authentication and refresh-token lifecycle.
 - Idempotency for scheduled/provider-triggered operations.
 - Versioning and deprecation policy.
+
+## Internal ML service (private – backend-to-backend only)
+
+Called only by Spring Boot through `ML_SERVICE_BASE_URL`. Never exposed to Angular or the public internet. No `/api` prefix. Service-to-service authentication is not implemented yet and is required before any inference endpoint is added.
+
+| Method | Path | Auth | Intent | Status |
+|---|---|---|---|---|
+| GET | `/health` | None (loopback-bound) | Liveness: process is up and serving | Implemented, tested |
+
+`GET /health` → `200 OK`
+
+```json
+{
+  "status": "ok",
+  "service": "agrigenius-ml-service",
+  "version": "0.1.0",
+  "environment": "local"
+}
+```
+
+- `status` is always `"ok"` when the process answers; any non-200 or timeout means unhealthy.
+- `environment` is one of `local`, `test`, `staging`, `production`.
+- This is liveness only. It does not check models or dependencies; a readiness check will be added with the first model.
+- OpenAPI is served at `/openapi.json` and `/docs` except when `ML_APP_ENV=production` (unless `ML_DOCS_ENABLED=true`).
