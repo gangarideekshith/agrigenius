@@ -1,0 +1,31 @@
+# Local development database (PostgreSQL 17 + pgvector).
+# Variables come from the root .env (see .env.example). From the repo root:
+#   docker compose --env-file .env -f infra/docker-compose.yml up -d
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg17
+    container_name: agrigenius-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+
+    # Bind to loopback only so the database is not reachable from other machines.
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+
+    volumes:
+      - agrigenius_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  agrigenius_postgres_data:
