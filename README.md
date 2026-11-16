@@ -36,7 +36,7 @@ Do not start a later phase without explicit approval.
 ## Technology direction
 
 - Frontend: Angular + TypeScript, standalone components, lazy routes, Reactive Forms, HttpClient.
-- Backend: Java 21 baseline, Spring Boot 3.x, Spring MVC, Spring Data JPA, Spring Security, JWT, Maven.
+- Backend: Java 21 baseline, Spring Boot 4.x (ADR-0002), Spring MVC, Spring Data JPA, Spring Security, JWT, Maven.
 - Database: PostgreSQL with Flyway migrations; Redis only where justified.
 - ML: Python + FastAPI for specialized services; scikit-learn, Random Forest, XGBoost, TensorFlow/PyTorch and OpenCV where suitable.
 - AI assistant: Spring AI, RAG, chat memory, tool calling and a vector store.

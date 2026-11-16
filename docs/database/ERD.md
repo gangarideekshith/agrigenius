@@ -36,3 +36,11 @@ users, farmer_profiles, farms, farm_locations, soil_details, soil_test_reports, 
 - A farm can have multiple weather alerts.
 - Store coordinates per farm location.
 - Use Flyway migrations; never rely on Hibernate auto-DDL for production schema changes.
+
+## Applied migrations
+
+| Version | File | Effect |
+|---|---|---|
+| V1 | `backend/src/main/resources/db/migration/V1__enable_pgvector.sql` | `CREATE EXTENSION IF NOT EXISTS vector` (no-op on the local DB, which already had it). No tables. |
+
+Flyway also creates `flyway_schema_history`. Hibernate runs with `ddl-auto=validate` and Flyway `clean` is disabled. Entity tables start with Milestone 2 once this ERD is approved.

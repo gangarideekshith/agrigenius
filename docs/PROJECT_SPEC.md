@@ -83,7 +83,7 @@ Inputs may include N/P/K, pH, moisture, soil type, temperature, humidity, rainfa
 ## 7. Technology requirements
 
 - Angular/TypeScript, standalone components, lazy loading, Reactive Forms, HttpClient, guards/interceptors.
-- Java 21 baseline; compatible Spring Boot 3.x; Spring MVC, Data JPA, Hibernate, Security, JWT, Maven, Jakarta Validation, OpenAPI, Actuator and Flyway.
+- Java 21 baseline; compatible Spring Boot 4.x (4.1.2, ADR-0002); Spring MVC, Data JPA, Hibernate, Security, JWT, Maven, Jakarta Validation, OpenAPI, Actuator and Flyway.
 - PostgreSQL; optional Redis when justified.
 - Python/FastAPI for specialized ML only; scikit-learn, Random Forest, XGBoost, TensorFlow/PyTorch, CNN/MobileNetV2/EfficientNet/ResNet50, OpenCV and time-series models as justified.
 - Spring AI for LLM integration and RAG.

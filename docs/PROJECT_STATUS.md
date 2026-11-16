@@ -6,8 +6,8 @@
 - Overall: Repository setup / Phase 1 foundation
 - Active phase: Phase 1
 - Active milestone: Milestone 0 – Plan and repository setup
-- Last verified update: 2026-11-17 – ML service foundation (`GET /health`), 15 pytest tests passing
-- Current blocker: None for the ML service. Spring Boot and Angular projects not yet created.
+- Last verified update: 2026-11-17 – Spring Boot backend foundation, `./mvnw verify` 36 tests passing
+- Current blocker: None. Angular project not yet created. Local machine needs the JVM socket-directory workaround to run the backend (see DEVELOPMENT.md).
 
 ## Phase status
 
@@ -19,7 +19,7 @@
 
 ## Milestones
 - [ ] M0 Plan and repository setup
-- [ ] M1 Phase 1 foundation (ML service foundation done; Spring Boot / Angular pending)
+- [ ] M1 Phase 1 foundation (ML service and Spring Boot foundations done; Angular pending)
 - [ ] M2 Identity, farmer and farms
 - [ ] M3 Crop recommendation
 - [ ] M4 Weather and alerts
@@ -42,14 +42,21 @@
   - Acceptance criteria: `/health` returns 200 with service/version/environment; config overridable by env vars and `.env`; invalid config fails fast; venv and `.env` excluded from Git; no ML features.
   - Evidence: `python -m pytest -v` → 15 passed; live `python -m app` + `Invoke-RestMethod http://127.0.0.1:8001/health` → `status: ok`.
   - Dependencies added: `pydantic-settings` (runtime); `pytest`, `httpx` (dev, `requirements-dev.txt`). `requirements.txt` converted from UTF-16 to UTF-8.
+  - CI: `.github/workflows/ml-service-tests.yml` (PR #1, merged); first GitHub run passed.
+- **Spring Boot backend foundation (2026-11-17, branch `feature/spring-boot-foundation`).** Spring Boot 4.1.2 / Java 21 in `backend/` with Maven Wrapper 3.9.16 (ADR-0002: 3.x no longer receives open-source fixes). Datasource from the root `.env` (`POSTGRES_*`, overridable by `DB_*`); Flyway V1 (`CREATE EXTENSION IF NOT EXISTS vector`); stateless deny-by-default security with JSON 401/403 and a CORS allowlist; problem+json error handling with request IDs; health/liveness/readiness/info; OpenAPI in the `local` profile only; `MlServiceClient` with timeouts and a `DEGRADED` health component.
+  - Acceptance criteria: app starts against the local DB; Flyway applies V1 without touching existing data; health public without details; `/api/**` returns 401; other actuator endpoints hidden; docs only in `local`; ML outage does not take the backend down; invalid configuration fails at startup; no secrets in source.
+  - Evidence: `./mvnw -B verify` → 36 tests, 0 failures (unit, MockMvc slice, Testcontainers on `pgvector/pgvector:0.8.7-pg17`). Real DB: schema backed up first; `flyway_schema_history` shows V1 success, no other tables; smoke tests: health `UP`, `/api/anything` 401 problem+json, `/actuator/env` 401, api-docs 200 (local), unknown CORS origin 403. With the real ML service running `mlService` = UP; after stopping it `mlService` = DEGRADED and overall health stays `UP`.
+  - CI: `.github/workflows/backend-tests.yml` (not yet run on GitHub).
 
 ## In progress
-- None recorded.
+- Spring Boot foundation awaiting review/commit on `feature/spring-boot-foundation`.
 
 ## Blockers and decisions needed
 - Service-to-service authentication between Spring Boot and the ML service must be designed before any inference endpoint is added.
+- The backend connects as the database superuser created by the Postgres image. Add a least-privilege application role before Milestone 2 (database change; needs approval).
+- This machine's JVM cannot create NIO sockets under `AppData\Local`; set `JDK_JAVA_OPTIONS=-Djdk.net.unixdomain.tmpdir=C:\dev\tmp` or find the blocking security setting (see DEVELOPMENT.md).
+- `JAVA_HOME` on this machine points at a missing JDK 17; set it to the JDK 21 path.
 - Starlette `TestClient` deprecation warning recommends `httpx2`; decide whether to switch dev dependency.
-- Confirm exact compatible dependency versions before generating projects.
 
 ## Next recommended task
-Plan the Spring Boot backend foundation (health, global errors, logging, OpenAPI, Flyway baseline) and the internal Spring Boot → ML service authentication approach. Do not start feature implementation until the user approves.
+Milestone 2 planning: finalize the users/roles/farmer/farm part of the ERD, the JWT token lifecycle and the least-privilege database role, then plan registration/login and farm CRUD with ownership checks. Do not start implementation until the user approves.
