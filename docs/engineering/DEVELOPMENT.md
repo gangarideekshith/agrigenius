@@ -34,6 +34,25 @@ A missing command should be recorded as unavailable; do not silently install sys
 
 Maintain `.env.example` with variable names and safe placeholders. Keep actual `.env` files out of Git. Document where each variable is consumed and never print secret values in diagnostic output.
 
+### Local PostgreSQL (root `.env.example`)
+
+Consumed by `infra/docker-compose.yml` (PostgreSQL 17 + pgvector 0.8.7). `POSTGRES_DB`, `POSTGRES_USER` and `POSTGRES_PASSWORD` are required; compose stops with a clear error if one is missing. The Spring Boot `DB_*` values must match them (`DB_NAME` = `POSTGRES_DB`, `DB_USERNAME` = `POSTGRES_USER`, `DB_PASSWORD` = `POSTGRES_PASSWORD`, `DB_PORT` = `POSTGRES_PORT`).
+
+| Variable | Example | Purpose |
+|---|---|---|
+| `POSTGRES_DB` | `agrigenius` | Database created on first start of an empty volume |
+| `POSTGRES_USER` | `agrigenius_app` | Database owner created on first start |
+| `POSTGRES_PASSWORD` | placeholder | Local password only; never commit a real value |
+| `POSTGRES_PORT` | `5432` | Host port, bound to `127.0.0.1` only |
+
+Validate the compose file without printing secrets (from the repo root):
+
+```powershell
+docker compose --env-file .env -f infra/docker-compose.yml config --quiet
+```
+
+The `POSTGRES_*` values only take effect when the data volume is empty. Changing them later does not change the existing database user or password.
+
 ### ML service (`ml-service/.env.example`)
 
 Consumed by `ml-service/app/core/config.py`. All use the `ML_` prefix and are validated at startup.
