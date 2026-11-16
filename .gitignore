@@ -1,0 +1,42 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials/
+secrets/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+
+# Java / Maven / IDE
+target/
+*.class
+.idea/
+.vscode/
+*.iml
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Local databases, logs, uploads and model artifacts
+*.log
+logs/
+data/local/
+uploads/
+models/local/
+*.sqlite
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
