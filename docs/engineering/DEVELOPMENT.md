@@ -75,7 +75,7 @@ Verified health check while the service runs: `Invoke-RestMethod http://127.0.0.
 |---|---|---|---|---|
 | Angular | Pending | Pending | Pending | Pending |
 | Spring Boot | Pending | Pending | Pending | Pending |
-| PostgreSQL | Pending | Pending | Pending | Pending |
+| PostgreSQL | n/a (image `pgvector/pgvector:0.8.7-pg17`) | `docker compose --env-file .env -f infra/docker-compose.yml up -d` (repo root) | `docker compose --env-file .env -f infra/docker-compose.yml config --quiet`; `docker ps` shows `(healthy)` | 5432 (127.0.0.1 only) |
 | Python ML | `cd ml-service; .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt` | `.\.venv\Scripts\python.exe -m app` | `.\.venv\Scripts\python.exe -m pytest -v` | 8001 (127.0.0.1 only) |
 
 ## Troubleshooting log
@@ -84,3 +84,4 @@ Record the symptom, root cause, exact fix, and verification command for recurrin
 
 - **`requirements.txt` shows as binary in Git.** Cause: Windows PowerShell 5.1 `pip freeze > requirements.txt` writes UTF-16. Fix: write pins as UTF-8 (e.g. `pip freeze | Out-File -Encoding utf8 requirements.txt`, or edit the file directly). Verify: `git diff` shows text changes.
 - **pytest warns `Using httpx with starlette.testclient is deprecated`.** Cause: Starlette 1.10 prefers `httpx2` for `TestClient`. Harmless for now; tests pass. Tracked as a follow-up.
+- **`ports are not available ... bind: Only one usage of each socket address` when recreating the Postgres container.** Cause: Docker Desktop had not yet released the previous container's port forward. Fix: wait a few seconds and rerun `docker compose --env-file .env -f infra/docker-compose.yml up -d`. Verify: `docker ps` shows `127.0.0.1:5432->5432/tcp` and `(healthy)`.
