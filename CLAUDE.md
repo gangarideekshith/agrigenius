@@ -29,7 +29,7 @@ Do not start Phase 2 or Phase 3 without explicit user approval. Do not silently 
 ## Approved technology direction
 
 - Angular + TypeScript frontend.
-- Java 21 baseline and compatible Spring Boot 3.x backend, Maven.
+- Java 21 baseline and compatible Spring Boot 4.x backend (4.1.2; see ADR-0002), Maven Wrapper.
 - PostgreSQL, Spring Data JPA/Hibernate and Flyway.
 - Spring Security, secure JWT lifecycle, BCrypt and role-based access control.
 - Python/FastAPI only for specialized ML services.

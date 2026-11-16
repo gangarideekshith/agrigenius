@@ -2,6 +2,42 @@
 
 Base path: `/api`. All authenticated endpoints must enforce role and resource ownership. Final DTOs, status codes and error schemas must be agreed before implementation and documented in OpenAPI.
 
+## Backend conventions (implemented in the foundation)
+
+**Errors.** Every error is `application/problem+json` (RFC 9457):
+
+```json
+{
+  "type": "about:blank",
+  "title": "Invalid request",
+  "status": 400,
+  "detail": "Request validation failed.",
+  "instance": "/api/farms",
+  "requestId": "3f2c6a2e-6b1d-4c8e-9f0a-1d2e3f4a5b6c",
+  "errors": [ { "field": "name", "message": "must not be blank" } ]
+}
+```
+
+- `errors` appears only for validation failures (sorted by field).
+- `500` responses never include exception messages or stack traces; quote `requestId` to find the log entry.
+- `401` (not authenticated) and `403` (not allowed) use the same shape and do not reveal why.
+
+**Request IDs.** Every response carries `X-Request-Id`. A client-supplied value is echoed if it matches `[A-Za-z0-9-]{1,64}`; otherwise a UUID is generated.
+
+**Authentication.** Not implemented yet: until JWT arrives in Milestone 2, every `/api/**` request returns `401`. CORS is allowed only for origins in `CORS_ALLOWED_ORIGINS`.
+
+**Operational endpoints (public, no `/api` prefix).**
+
+| Method | Path | Response |
+|---|---|---|
+| GET | `/actuator/health` | `{"status":"UP"}` (no component details) |
+| GET | `/actuator/health/liveness` | `{"status":"UP"}` |
+| GET | `/actuator/health/readiness` | `{"status":"UP"}`; DOWN if the database is unavailable |
+| GET | `/actuator/info` | `{"app":{"name":"AgriGenius Backend","description":"…"}}` |
+| GET | `/v3/api-docs`, `/swagger-ui.html` | OpenAPI document and UI; `local` profile only |
+
+Other actuator endpoints are not exposed (`401`).
+
 | Area | Method | Path | Intent |
 |---|---|---|---|
 | Auth | POST | `/api/auth/register` | Register |

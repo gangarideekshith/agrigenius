@@ -1,0 +1,14 @@
+# Test profile. Database connection details come from Testcontainers (@ServiceConnection);
+# these placeholders only satisfy the required values in application.yml so tests never
+# depend on, or connect to, the developer's local database or .env file.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/not-used-in-tests
+    username: test
+    password: test
+
+agrigenius:
+  ml-service:
+    base-url: http://127.0.0.1:1
+    connect-timeout: 200ms
+    read-timeout: 200ms

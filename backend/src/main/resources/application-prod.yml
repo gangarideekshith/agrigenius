@@ -1,0 +1,12 @@
+# Production profile. Activate with the SPRING_PROFILES_ACTIVE=prod environment variable.
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+logging:
+  structured:
+    format:
+      console: ecs
