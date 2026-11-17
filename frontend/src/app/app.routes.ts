@@ -23,6 +23,12 @@ export const routes: Routes = [
     title: 'Home · AgriGenius',
   },
   {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile').then((m) => m.ProfilePage),
+    title: 'My profile · AgriGenius',
+  },
+  {
     path: 'recommendations',
     canActivate: [authGuard],
     loadComponent: () => import('./features/recommendations/history').then((m) => m.RecommendationHistoryPage),

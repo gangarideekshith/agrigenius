@@ -9,7 +9,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import com.agrigenius.farmer.api.dto.UpdateFarmerProfileRequest;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,5 +38,14 @@ public class FarmerController {
     @Operation(summary = "Get the signed-in farmer's profile")
     public FarmerProfileResponse me(@AuthenticationPrincipal Jwt jwt) {
         return profileService.getForAccount(UUID.fromString(jwt.getSubject()));
+    }
+
+    @PutMapping("/me")
+    @Operation(summary = "Update the signed-in farmer's profile",
+            description = "Replaces the editable fields (name, language, email, state, district, village, address). "
+                    + "The mobile number cannot be changed.")
+    public FarmerProfileResponse updateMe(@AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody UpdateFarmerProfileRequest request) {
+        return profileService.updateForAccount(UUID.fromString(jwt.getSubject()), request);
     }
 }

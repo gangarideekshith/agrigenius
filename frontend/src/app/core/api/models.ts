@@ -15,6 +15,17 @@ export interface LoginResponse {
   user: { id: string; role: string };
 }
 
+/** PUT /api/farmers/me: full replacement of the editable fields (mobile number is not editable). */
+export interface UpdateProfileRequest {
+  fullName: string;
+  preferredLanguage: LanguageCode;
+  email: string | null;
+  state: string | null;
+  district: string | null;
+  village: string | null;
+  addressLine: string | null;
+}
+
 export interface RegisterRequest {
   fullName: string;
   mobileNumber: string;

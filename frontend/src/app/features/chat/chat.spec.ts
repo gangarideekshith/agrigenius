@@ -34,7 +34,7 @@ async function setupWithSession() {
 }
 
 describe('ChatPage', () => {
-  it('shows a full-panel notice when the chat assistant is not configured', async () => {
+  it('shows a notice when the chat assistant is not configured', async () => {
     TestBed.configureTestingModule({
       providers: [provideRouter([]), provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])), provideHttpClientTesting()],
     });
@@ -47,6 +47,24 @@ describe('ChatPage', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('The chat assistant is not configured yet');
     expect(el.querySelector('textarea')).toBeNull();
+  });
+
+  it('keeps conversations visible and disables sending after CHAT_DISABLED on send', async () => {
+    const { http, fixture, el } = await setupWithSession();
+    const page = fixture.componentInstance;
+    page.draft.set('Hello');
+    await fixture.whenStable();
+    page.send();
+    http.expectOne((r) => r.method === 'POST' && r.url === '/api/chat/sessions/s1/messages')
+      .flush({ code: 'CHAT_DISABLED' }, { status: 503, statusText: 'Unavailable' });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(el.querySelector('.chat-disabled')?.textContent).toContain('not configured');
+    expect(el.querySelector('.session-list')).not.toBeNull();
+    page.draft.set('Another question');
+    await fixture.whenStable();
+    expect(page.canSend()).toBe(false);
   });
 
   it('disables sending while the answer is pending, then renders it as plain text', async () => {

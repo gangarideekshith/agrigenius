@@ -66,6 +66,17 @@ public class FarmerProfile {
         this.updatedAt = now;
     }
 
+    /** Applies an owner-requested profile edit. Values are already validated and trimmed. */
+    public void update(String fullName, PreferredLanguage preferredLanguage, String state, String district,
+            String village, String addressLine) {
+        this.fullName = Objects.requireNonNull(fullName);
+        this.preferredLanguage = preferredLanguage.code();
+        this.state = state;
+        this.district = district;
+        this.village = village;
+        this.addressLine = addressLine;
+    }
+
     @PreUpdate
     void touch() {
         this.updatedAt = Instant.now();

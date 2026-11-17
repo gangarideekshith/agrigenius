@@ -69,6 +69,11 @@ public class UserAccount {
         this.lastLoginAt = when;
     }
 
+    /** Email is optional and stored lowercase (checked by the database). Mobile number never changes. */
+    public void changeEmail(String email) {
+        this.email = email;
+    }
+
     public void disable() {
         this.status = AccountStatus.DISABLED;
     }

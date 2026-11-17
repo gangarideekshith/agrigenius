@@ -13,7 +13,8 @@
     "logout": "Sign out",
     "language": "Language",
     "menu": "Menu",
-    "mainNavigation": "Main navigation"
+    "mainNavigation": "Main navigation",
+    "profile": "My profile"
   },
   "common": {
     "loading": "Loading…",
@@ -101,7 +102,12 @@
     "historyTitle": "See past advice",
     "historyText": "Open crop advice you asked for before.",
     "chatTitle": "Ask a question",
-    "chatText": "Ask about crops, soil, pests and irrigation in your language."
+    "chatText": "Ask about crops, soil, pests and irrigation in your language.",
+    "editProfile": "Edit profile",
+    "latestRecTitle": "Your latest crop advice",
+    "latestRecEmpty": "You have not asked for crop advice yet.",
+    "latestRecOpen": "View details",
+    "latestRecError": "Your latest crop advice could not be loaded."
   },
   "rec": {
     "newTitle": "Get crop advice",
@@ -272,5 +278,23 @@
     "NETWORK_ERROR": "Cannot reach AgriGenius. Check your internet connection.",
     "INTERNAL_ERROR": "Something went wrong on our side.",
     "UNKNOWN_ERROR": "Something went wrong. Please try again."
+  },
+  "profile": {
+    "title": "My profile",
+    "editTitle": "Edit your details",
+    "mobileReadOnly": "Your mobile number is used to sign in and cannot be changed here.",
+    "addressLine": "Address",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Your profile has been saved."
+  },
+  "featureLabels": {
+    "nitrogenKgHa": "Nitrogen (kg/ha)",
+    "phosphorusKgHa": "Phosphorus (kg/ha)",
+    "potassiumKgHa": "Potassium (kg/ha)",
+    "ph": "Soil pH",
+    "temperatureC": "Temperature (°C)",
+    "humidityPct": "Humidity (%)",
+    "rainfallMm": "Rainfall (mm)"
   }
 }

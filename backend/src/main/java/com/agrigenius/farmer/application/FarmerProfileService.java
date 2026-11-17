@@ -2,7 +2,9 @@ package com.agrigenius.farmer.application;
 
 import com.agrigenius.common.error.AuthenticationRequiredException;
 import com.agrigenius.farmer.api.dto.FarmerProfileResponse;
+import com.agrigenius.farmer.api.dto.UpdateFarmerProfileRequest;
 import com.agrigenius.farmer.domain.FarmerProfile;
+import com.agrigenius.farmer.domain.PreferredLanguage;
 import com.agrigenius.farmer.infrastructure.FarmerProfileRepository;
 import com.agrigenius.identity.application.UserAccountService;
 import com.agrigenius.identity.application.UserAccountService.AccountView;
@@ -32,6 +34,22 @@ public class FarmerProfileService {
         FarmerProfile profile = profiles.findById(accountId)
                 .orElseThrow(AuthenticationRequiredException::new);
         return toResponse(account, profile);
+    }
+
+    /**
+     * Owner-only update of the editable fields; account id comes from the verified token.
+     * Profile and email change commit together or not at all.
+     */
+    @Transactional
+    public FarmerProfileResponse updateForAccount(UUID accountId, UpdateFarmerProfileRequest request) {
+        accounts.findActiveById(accountId).orElseThrow(AuthenticationRequiredException::new);
+        FarmerProfile profile = profiles.findById(accountId).orElseThrow(AuthenticationRequiredException::new);
+        PreferredLanguage language = PreferredLanguage.fromCode(request.preferredLanguage())
+                .orElseThrow(() -> new IllegalArgumentException("preferredLanguage must be validated before update"));
+        AccountView account = accounts.changeEmail(accountId, request.email());
+        profile.update(request.fullName(), language, request.state(), request.district(), request.village(),
+                request.addressLine());
+        return toResponse(account, profiles.saveAndFlush(profile));
     }
 
     static FarmerProfileResponse toResponse(AccountView account, FarmerProfile profile) {
