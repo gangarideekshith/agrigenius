@@ -12,21 +12,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.agrigenius.common.error.GlobalExceptionHandler;
 import com.agrigenius.common.web.RequestIdFilter;
 import com.agrigenius.support.TestApiController;
+import com.agrigenius.support.WebSliceTestConfig;
+import org.springframework.test.context.ActiveProfiles;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = TestApiController.class)
-@Import({SecurityConfig.class, GlobalExceptionHandler.class, RequestIdFilter.class})
-@EnableConfigurationProperties(CorsProperties.class)
-@TestPropertySource(properties = "agrigenius.cors.allowed-origins=http://localhost:4200")
+@Import(WebSliceTestConfig.class)
+@ActiveProfiles("test")
 class SecurityConfigTest {
 
     @Autowired
@@ -41,7 +40,8 @@ class SecurityConfigTest {
                 .andExpect(jsonPath("$.status").value(401))
                 .andExpect(jsonPath("$.instance").value("/api/test/ping"))
                 .andExpect(jsonPath("$.requestId").isNotEmpty())
-                .andExpect(header().doesNotExist(HttpHeaders.WWW_AUTHENTICATE));
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"))
+                .andExpect(header().string(HttpHeaders.WWW_AUTHENTICATE, "Bearer"));
     }
 
     @Test

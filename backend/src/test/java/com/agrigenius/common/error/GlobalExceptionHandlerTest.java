@@ -12,20 +12,19 @@ import com.agrigenius.common.web.RequestIdFilter;
 import com.agrigenius.config.CorsProperties;
 import com.agrigenius.config.SecurityConfig;
 import com.agrigenius.support.TestApiController;
+import com.agrigenius.support.WebSliceTestConfig;
+import org.springframework.test.context.ActiveProfiles;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = TestApiController.class)
-@Import({SecurityConfig.class, GlobalExceptionHandler.class, RequestIdFilter.class})
-@EnableConfigurationProperties(CorsProperties.class)
-@TestPropertySource(properties = "agrigenius.cors.allowed-origins=http://localhost:4200")
+@Import(WebSliceTestConfig.class)
+@ActiveProfiles("test")
 @WithMockUser
 class GlobalExceptionHandlerTest {
 

@@ -1,13 +1,31 @@
 # Test profile. Database connection details come from Testcontainers (@ServiceConnection);
-# these placeholders only satisfy the required values in application.yml so tests never
+# the values below only satisfy the required settings in application.yml so tests never
 # depend on, or connect to, the developer's local database or .env file.
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/not-used-in-tests
-    username: test
+  flyway:
+    # PostgreSQLContainer's default superuser; Flyway runs migrations as the owner.
+    user: test
     password: test
 
 agrigenius:
+  database:
+    app-role:
+      manage: true
+      username: agrigenius_app_test
+      password: test-only-app-role-password
+  security:
+    jwt:
+      issuer: agrigenius-test
+      # base64("agrigenius-test-only-signing-key-NOT-A-SECRET-00"): 48 bytes, test profile only.
+      secret: YWdyaWdlbml1cy10ZXN0LW9ubHktc2lnbmluZy1rZXktTk9ULUEtU0VDUkVULTAw
+      access-token-ttl: 30m
+    throttling:
+      # MockMvc requests all come from 127.0.0.1; tests that exercise throttling set their own limits.
+      failed-logins-per-mobile: 5
+      requests-per-ip: 10000
+      window: 15m
   ml-service:
     base-url: http://127.0.0.1:1
     connect-timeout: 200ms
