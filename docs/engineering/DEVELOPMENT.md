@@ -71,6 +71,7 @@ Consumed by `backend/src/main/resources/application.yml`, which imports the root
 | `JWT_REFRESH_TOKEN_DAYS` | — | Unused until refresh tokens are implemented (deferred, D1) |
 | `SERVER_PORT` | `8080` | HTTP port |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:4200` | Comma-separated browser origins for `/api/**`; `*` is rejected |
+| `ML_SERVICE_API_KEY` | required | Sent as `X-Internal-Api-Key` to the ML service (ADR-0004). **Must equal `ML_INTERNAL_API_KEY`** in `ml-service/.env`; at least 32 characters. Generate: `openssl rand -base64 48` |
 | `ML_SERVICE_BASE_URL` | `http://localhost:8001` | Private ML service; never sent to the browser |
 | `ML_SERVICE_CONNECT_TIMEOUT`, `ML_SERVICE_READ_TIMEOUT` | `2s`, `5s` | ML service HTTP timeouts |
 | `SPRING_PROFILES_ACTIVE` | none | **Not read from `.env`** (verified). Set it as a real environment variable or with `-Dspring-boot.run.profiles=local`. `local` enables Swagger UI; `prod` uses JSON logs. |
@@ -96,8 +97,27 @@ Consumed by `ml-service/app/core/config.py`. All use the `ML_` prefix and are va
 | `ML_PORT` | `8001` | Must match root `ML_SERVICE_BASE_URL` |
 | `ML_LOG_LEVEL` | `INFO` | Python log level |
 | `ML_DOCS_ENABLED` | unset | Unset → OpenAPI docs on except in production |
+| `ML_INTERNAL_API_KEY` | required | Shared secret required on `/v1/**` (ADR-0004); same value as the backend's `ML_SERVICE_API_KEY`, at least 32 characters. The service refuses to start without it. |
+| `ML_MODEL_DIR` | `models/crop_recommendation` | Directory containing versioned crop model artifacts |
+| `ML_CROP_MODEL_VERSION` | `1.0.0` | Artifact version to load (`<ML_MODEL_DIR>/<version>/model.joblib` + `metadata.json`) |
 
 Verified health check while the service runs: `Invoke-RestMethod http://127.0.0.1:8001/health`.
+
+### Crop model training (ML service)
+
+Verified 2026-11-17 (training takes ~17 s; the artifact is ~51 MB and gitignored). From `ml-service/`:
+
+```powershell
+# Train and write models/crop_recommendation/1.0.0/{model.joblib,metadata.json}
+.\.venv\Scripts\python.exe -m training.train_crop_model --csv data/raw/Crop_recommendation.csv --out models/crop_recommendation --version 1.0.0 --data-label DEMO_PUBLIC_DATASET --seed 42
+
+# Readiness: 200 when the model is loaded and its SHA-256 verified, 503 otherwise
+Invoke-RestMethod http://127.0.0.1:8001/health/ready
+```
+
+- The dataset is committed (`data/raw/Crop_recommendation.csv`, Apache 2.0, SHA-256 in `data/raw/NOTICE.md`). Train once after cloning; the service reports `not_ready` until the artifact exists. Unit tests use a small synthetic fixture instead.
+- **Smoke-testing alongside your own running backend:** the `afterMigrate` callback sets the `DB_USERNAME` role's password to the `DB_PASSWORD` of whichever backend starts. Always start extra instances with the same `.env` values (only change `SERVER_PORT`), otherwise the role password changes underneath the other instance.
+- `ML_INTERNAL_API_KEY` (ML service) and `ML_SERVICE_API_KEY` (backend) must hold the **same** value; generate it once with `openssl rand -base64 48`. Both services refuse to start without it.
 
 ## Verified commands
 

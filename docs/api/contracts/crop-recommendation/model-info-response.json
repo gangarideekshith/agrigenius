@@ -1,0 +1,11 @@
+{
+  "name": "crop-recommendation-rf",
+  "version": "1.0.0",
+  "sha256": "3f5a1c9e0b7d2a4f6e8c1b3d5f7a9c0e2b4d6f8a1c3e5b7d9f0a2c4e6b8d0f1a",
+  "data_label": "DEMO_PUBLIC_DATASET",
+  "features": ["nitrogen", "phosphorus", "potassium", "temperature_c", "humidity_pct", "ph", "rainfall_mm"],
+  "classes": ["apple", "banana", "blackgram", "chickpea", "coconut", "coffee", "cotton", "grapes", "jute", "kidneybeans", "lentil", "maize", "mango", "mothbeans", "mungbean", "muskmelon", "orange", "papaya", "pigeonpeas", "pomegranate", "rice", "watermelon"],
+  "feature_ranges": { "rainfall_mm": { "min": 20.2, "max": 298.6 } },
+  "metrics": { "macro_f1": 0.99, "accuracy": 0.99, "cv_macro_f1_mean": 0.99, "cv_macro_f1_std": 0.005 },
+  "trained_at": "2026-11-17T00:00:00Z"
+}

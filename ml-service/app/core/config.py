@@ -9,7 +9,7 @@ from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 SERVICE_ROOT = Path(__file__).resolve().parents[2]
@@ -40,6 +40,21 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     # None means "derive from app_env": enabled everywhere except production.
     docs_enabled: bool | None = None
+
+    # Shared secret the Spring Boot backend sends in X-Internal-Api-Key (ADR-0004).
+    # Required: the service refuses to start without a strong key.
+    internal_api_key: SecretStr = Field(min_length=32)
+    # Root directory of crop model artifacts; the active model lives in <model_dir>/<version>/.
+    model_dir: Path = SERVICE_ROOT / "models" / "crop_recommendation"
+    # Semantic version only, so it can never escape model_dir as a path.
+    crop_model_version: str = Field(default="1.0.0", pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
+
+    @field_validator("internal_api_key")
+    @classmethod
+    def _reject_placeholder_key(cls, value: SecretStr) -> SecretStr:
+        if value.get_secret_value().strip().upper().startswith("REPLACE_WITH"):
+            raise ValueError("internal_api_key must be a generated secret, not the .env.example placeholder")
+        return value
 
     @field_validator("log_level")
     @classmethod

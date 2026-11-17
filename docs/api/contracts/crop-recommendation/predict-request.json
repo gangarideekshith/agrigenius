@@ -1,0 +1,13 @@
+{
+  "request_id": "8b0c2f1e-4a5d-4c3b-9e7f-1a2b3c4d5e6f",
+  "top_k": 5,
+  "features": {
+    "nitrogen": 90.0,
+    "phosphorus": 42.0,
+    "potassium": 43.0,
+    "temperature_c": 20.88,
+    "humidity_pct": 82.0,
+    "ph": 6.5,
+    "rainfall_mm": 202.94
+  }
+}

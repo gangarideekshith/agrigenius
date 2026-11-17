@@ -51,3 +51,15 @@ jobs:
 
       - name: Run pytest
         run: python -m pytest -v
+
+      # Verifies the committed dataset (checksum) and that the training pipeline still meets the
+      # quality floor on it. The artifact is written to a temp dir and discarded (ADR-0005).
+      - name: Verify dataset checksum
+        run: echo "808e1d84a544647f1ab2fdae04f434b1842692d6be09eee18a5c2d43eb78d77c  data/raw/Crop_recommendation.csv" | sha256sum --check
+
+      - name: Train crop model on committed dataset
+        run: >
+          python -m training.train_crop_model
+          --csv data/raw/Crop_recommendation.csv
+          --out "$RUNNER_TEMP/models/crop_recommendation"
+          --version 1.0.0 --data-label DEMO_PUBLIC_DATASET --seed 42 --min-macro-f1 0.90
