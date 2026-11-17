@@ -1,0 +1,34 @@
+# SYNTHETIC TEST CORPUS – not agricultural advice. Tests copy this folder, replace each sha256
+# placeholder below with the file's real checksum (line endings differ between checkouts) and write
+# manifest.yaml. It is never ingested into a real database (synthetic data is refused there).
+documents:
+  - title: "SYNTHETIC TEST DOCUMENT – paddy leaf spots"
+    publisher: "AgriGenius test suite"
+    url: "https://example.test/synthetic/paddy-leaf-spots"
+    licence: "SYNTHETIC-TEST-ONLY"
+    data_label: "SYNTHETIC_TEST_DATA"
+    language: "en"
+    crops: ["rice"]
+    topics: ["diseases"]
+    file: "paddy-leaf-spots.md"
+    sha256: "{{sha256:paddy-leaf-spots.md}}"
+  - title: "SYNTHETIC TEST DOCUMENT – maize watering"
+    publisher: "AgriGenius test suite"
+    url: "https://example.test/synthetic/maize-watering"
+    licence: "SYNTHETIC-TEST-ONLY"
+    data_label: "SYNTHETIC_TEST_DATA"
+    language: "en"
+    crops: ["maize"]
+    topics: ["irrigation"]
+    file: "maize-watering.md"
+    sha256: "{{sha256:maize-watering.md}}"
+  - title: "SYNTHETIC TEST DOCUMENT – soil sampling"
+    publisher: "AgriGenius test suite"
+    url: "https://example.test/synthetic/soil-sampling"
+    licence: "SYNTHETIC-TEST-ONLY"
+    data_label: "SYNTHETIC_TEST_DATA"
+    language: "en"
+    crops: []
+    topics: ["soil"]
+    file: "soil-sampling.txt"
+    sha256: "{{sha256:soil-sampling.txt}}"

@@ -49,6 +49,29 @@ spring:
       imperative:
         factory: simple
 
+  # AI agriculture chatbot (ADR-0006). Both models are OFF unless explicitly enabled, so the app,
+  # CI and tests never need an API key or a model download. With chat off the chat endpoints
+  # answer 503 CHAT_DISABLED.
+  ai:
+    model:
+      chat: ${CHAT_PROVIDER:none}               # anthropic | none
+      embedding: ${EMBEDDING_PROVIDER:none}     # e5-onnx | none (custom ONNX model, ADR-0006)
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+      chat:
+        options:
+          model: ${CHAT_MODEL:claude-opus-5-5}
+          max-tokens: ${CHAT_MAX_OUTPUT_TOKENS:1024}
+    vectorstore:
+      type: ${VECTOR_STORE_TYPE:none}            # pgvector | none (needs EMBEDDING_PROVIDER=e5-onnx)
+      pgvector:
+        initialize-schema: false                # Flyway owns knowledge_chunks (V4)
+        schema-name: public
+        table-name: knowledge_chunks
+        dimensions: 384
+        distance-type: COSINE_DISTANCE
+        index-type: HNSW
+
 server:
   port: ${SERVER_PORT:8080}
   error:
@@ -126,6 +149,23 @@ agrigenius:
       medium: 0.30
     throttle:
       per-user-per-hour: 30
+  chat:
+    # Decisions C1, C9. Limits apply per farmer unless stated otherwise.
+    effort: ${CHAT_EFFORT:low}
+    messages-per-window: ${CHAT_MESSAGES_PER_10_MIN:20}
+    window: 10m
+    daily-message-limit: ${CHAT_DAILY_MESSAGE_LIMIT:40}
+    daily-token-budget: ${CHAT_DAILY_TOKEN_BUDGET:2000000}   # all users together, input + output
+    history-messages: 10
+    max-content-chars: 2000
+    max-messages-per-session: 200
+    max-active-sessions: 50
+    provider-timeout: 60s
+  knowledge:
+    top-k: 5
+    similarity-threshold: ${CHAT_SIMILARITY_THRESHOLD:0.75}   # provisional; tuned on the gold set
+    max-context-chars: 10000
+    embedding-cache-dir: ${EMBEDDING_MODEL_CACHE_DIR:${user.home}/.agrigenius/embedding-models}
 
 logging:
   pattern:

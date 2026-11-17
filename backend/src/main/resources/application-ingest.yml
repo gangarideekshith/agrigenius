@@ -1,0 +1,6 @@
+# Knowledge ingestion run (profile "ingest"): no web server, so it never conflicts with a running backend.
+#   ./mvnw spring-boot:run -Dspring-boot.run.profiles=local,ingest
+# Requires EMBEDDING_PROVIDER=e5-onnx and VECTOR_STORE_TYPE=pgvector.
+spring:
+  main:
+    web-application-type: none

@@ -84,6 +84,30 @@ Generate `JWT_SECRET` (48 random bytes, base64):
 
 **Upgrading your local `.env` (Milestone 2).** Before starting the backend, add `JWT_SECRET`, `DB_USERNAME` (for example `agrigenius_app`) and `DB_PASSWORD` to the root `.env`. `DB_USERNAME` must not be the same as `POSTGRES_USER`. On the next start, Flyway (as `POSTGRES_USER`) creates the `DB_USERNAME` role with that password and grants it data-only access; the backend then connects as that role. Changing `DB_PASSWORD` later updates the role's password on the next start.
 
+### Agriculture chatbot (optional LLM provider; ADR-0006)
+
+The chatbot is **off** unless `ANTHROPIC_API_KEY` is set: chat endpoints then return `503 CHAT_DISABLED` and everything else works. The key is read only by the backend; never put it in Angular config, logs or committed files.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | empty (chat disabled) | Anthropic API key used by Spring AI. Backend only. |
+| `CHAT_MODEL` | `claude-opus-5-5` | Claude model id. Cheaper options (`claude-sonnet-5-5`, `claude-haiku-5-5`) are the owner's choice (ADR-0006 cost table). |
+| `CHAT_EFFORT` | `low` | Model effort level |
+| `CHAT_MAX_OUTPUT_TOKENS` | `1024` | Maximum tokens per answer |
+| `CHAT_MESSAGES_PER_10_MIN` | `20` | Per-farmer short-term limit (429 `TOO_MANY_REQUESTS`) |
+| `CHAT_DAILY_MESSAGE_LIMIT` | `40` | Per-farmer daily limit (429 `CHAT_DAILY_LIMIT_REACHED`) |
+| `CHAT_DAILY_TOKEN_BUDGET` | `2000000` | Global input + output tokens per day; when spent, chat returns 503 until the next day |
+| `CHAT_SIMILARITY_THRESHOLD` | to be tuned on the gold-question set | Minimum cosine similarity for a retrieved chunk; below it the answer is `NO_SOURCES` |
+| `EMBEDDING_MODEL_CACHE_DIR` | `${user.home}/.agrigenius/models` | Where the ONNX embedding model (`intfloat/multilingual-e5-small`) is cached. **The first start downloads it** (roughly 120–470 MB depending on the variant); later starts use the cache. |
+
+Knowledge ingestion (planned, verify): reads `knowledge/manifest.yaml`, refuses unlisted licences and checksum mismatches, and is idempotent.
+
+```powershell
+cd backend; ./mvnw spring-boot:run "-Dspring-boot.run.profiles=local,ingest"
+```
+
+Live-model tests are **opt-in** (JUnit tag `live-llm`), excluded from `./mvnw verify` and CI, need `ANTHROPIC_API_KEY`, and **cost money** (about $1 approved for the first spike and evaluation, decision C8). Run them only with the owner's approval.
+
 ### ML service (`ml-service/.env.example`)
 
 Consumed by `ml-service/app/core/config.py`. All use the `ML_` prefix and are validated at startup.
@@ -123,7 +147,7 @@ Invoke-RestMethod http://127.0.0.1:8001/health/ready
 
 | Component | Install/build | Run | Test | Port |
 |---|---|---|---|---|
-| Angular | Pending | Pending | Pending | Pending |
+| Angular (planned, verify) | `cd frontend; npm ci` | `npx ng serve` (proxies `/api` to `http://localhost:8080`) | `npx ng test --watch=false`; `npx ng build` | 4200 |
 | Spring Boot | `cd backend; ./mvnw -B verify` (Docker must be running) | `./mvnw spring-boot:run -Dspring-boot.run.profiles=local` (see the JVM socket troubleshooting entry on this machine) | `./mvnw -B verify` → 36 tests; `curl http://localhost:8080/actuator/health` → `{"status":"UP"}` | 8080 |
 | PostgreSQL | n/a (image `pgvector/pgvector:0.8.7-pg17`) | `docker compose --env-file .env -f infra/docker-compose.yml up -d` (repo root) | `docker compose --env-file .env -f infra/docker-compose.yml config --quiet`; `docker ps` shows `(healthy)` | 5432 (127.0.0.1 only) |
 | Python ML | `cd ml-service; .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt` | `.\.venv\Scripts\python.exe -m app` | `.\.venv\Scripts\python.exe -m pytest -v` | 8001 (127.0.0.1 only) |

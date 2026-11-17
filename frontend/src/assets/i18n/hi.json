@@ -1,0 +1,65 @@
+{
+  "_status": "DRAFT - needs native-speaker review",
+  "app": { "tagline": "आपके खेत के लिए स्मार्ट मदद", "skipToContent": "मुख्य सामग्री पर जाएँ" },
+  "nav": {
+    "dashboard": "होम",
+    "newRecommendation": "फसल सलाह",
+    "history": "मेरी सलाह का इतिहास",
+    "chat": "AgriGenius से पूछें",
+    "logout": "साइन आउट",
+    "language": "भाषा",
+    "menu": "मेनू"
+  },
+  "common": {
+    "loading": "लोड हो रहा है…",
+    "retry": "फिर से कोशिश करें",
+    "cancel": "रद्द करें",
+    "back": "वापस",
+    "next": "आगे",
+    "previous": "पीछे",
+    "yes": "हाँ",
+    "no": "नहीं",
+    "notSure": "पता नहीं",
+    "select": "चुनें…",
+    "delete": "हटाएँ"
+  },
+  "login": {
+    "title": "साइन इन करें",
+    "mobile": "मोबाइल नंबर",
+    "password": "पासवर्ड",
+    "submit": "साइन इन करें",
+    "submitting": "साइन इन हो रहा है…",
+    "noAccount": "AgriGenius पर नए हैं?",
+    "registerLink": "खाता बनाएँ"
+  },
+  "register": {
+    "title": "अपना खाता बनाएँ",
+    "fullName": "पूरा नाम",
+    "mobile": "मोबाइल नंबर",
+    "password": "पासवर्ड",
+    "language": "पसंदीदा भाषा",
+    "state": "राज्य",
+    "district": "ज़िला",
+    "village": "गाँव",
+    "submit": "खाता बनाएँ"
+  },
+  "validation": {
+    "required": "कृपया यह भरें।",
+    "mobile": "सही 10 अंकों का भारतीय मोबाइल नंबर डालें।"
+  },
+  "dashboard": {
+    "greeting": "नमस्ते, {name}",
+    "newRecTitle": "फसल सलाह लें",
+    "chatTitle": "सवाल पूछें"
+  },
+  "chat": {
+    "title": "AgriGenius से पूछें",
+    "newChat": "नई बातचीत",
+    "send": "भेजें",
+    "placeholder": "अपना सवाल लिखें…"
+  },
+  "errors": {
+    "INVALID_CREDENTIALS": "मोबाइल नंबर या पासवर्ड सही नहीं है।",
+    "NETWORK_ERROR": "AgriGenius से जुड़ नहीं पा रहे हैं। अपना इंटरनेट जाँचें।"
+  }
+}

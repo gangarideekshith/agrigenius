@@ -279,3 +279,61 @@ Design notes:
 - `model_name`, `model_version` and `model_sha256` tie each result to the exact artifact that produced it.
 - The application role gets read/write on these tables through the `afterMigrate.sql` callback; `crops` is reference data seeded by the migration.
 - Crop names in other languages and agronomy facts (water needs, duration) are added later, only from cited sources.
+
+
+## Agriculture chatbot (V4, planned until the migration lands)
+
+```mermaid
+erDiagram
+    USERS ||--o{ CHAT_SESSIONS : owns
+    CHAT_SESSIONS ||--o{ CHAT_MESSAGES : contains
+    USERS ||--o{ CHAT_USAGE_DAILY : "is metered by"
+    KNOWLEDGE_DOCUMENTS ||--o{ KNOWLEDGE_CHUNKS : "is split into (metadata.documentId)"
+```
+
+```sql
+CREATE TABLE chat_sessions (
+  id UUID PRIMARY KEY, user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(120), language VARCHAR(5) NOT NULL CHECK (language IN ('en','hi','te','kn','ta')),
+  status VARCHAR(10) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','ARCHIVED')),
+  message_count INT NOT NULL DEFAULT 0, created_at TIMESTAMPTZ NOT NULL, last_message_at TIMESTAMPTZ,
+  version BIGINT NOT NULL DEFAULT 0);
+CREATE INDEX ix_chat_sessions_user ON chat_sessions (user_id, last_message_at DESC);
+
+CREATE TABLE chat_messages (
+  id UUID PRIMARY KEY, session_id UUID NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL,                       -- denormalised for owner-scoped queries
+  role VARCHAR(10) NOT NULL CHECK (role IN ('USER','ASSISTANT')),
+  status VARCHAR(12) NOT NULL CHECK (status IN ('OK','FAILED','REFUSED','NO_SOURCES')),
+  content TEXT NOT NULL CHECK (length(content) <= 8000),
+  sources JSONB NOT NULL DEFAULT '[]',         -- [{documentId, title, publisher, url, chunk}]
+  tools_used JSONB NOT NULL DEFAULT '[]',      -- names + outcome only, never data
+  model VARCHAR(60), input_tokens INT, output_tokens INT, cache_read_tokens INT, latency_ms INT,
+  created_at TIMESTAMPTZ NOT NULL);
+CREATE INDEX ix_chat_messages_session ON chat_messages (session_id, created_at);
+
+CREATE TABLE knowledge_documents (
+  id UUID PRIMARY KEY, title VARCHAR(300) NOT NULL, publisher VARCHAR(200) NOT NULL,
+  source_url VARCHAR(500) NOT NULL, licence VARCHAR(60) NOT NULL, language VARCHAR(5) NOT NULL,
+  crops TEXT[] NOT NULL DEFAULT '{}', topics TEXT[] NOT NULL DEFAULT '{}',
+  sha256 CHAR(64) NOT NULL UNIQUE, status VARCHAR(10) NOT NULL CHECK (status IN ('ACTIVE','RETIRED')),
+  chunk_count INT NOT NULL, ingested_at TIMESTAMPTZ NOT NULL);
+
+CREATE TABLE knowledge_chunks (                -- the Spring AI PgVectorStore table (custom name)
+  id UUID PRIMARY KEY, content TEXT NOT NULL, metadata JSONB NOT NULL,
+  embedding vector(384) NOT NULL);
+CREATE INDEX ix_knowledge_chunks_hnsw ON knowledge_chunks USING hnsw (embedding vector_cosine_ops);
+
+CREATE TABLE chat_usage_daily (
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, day DATE NOT NULL,
+  requests INT NOT NULL, input_tokens BIGINT NOT NULL, output_tokens BIGINT NOT NULL,
+  PRIMARY KEY (user_id, day));
+```
+
+Design notes:
+- `chat_messages.user_id` duplicates the session owner so every message query can filter by owner directly.
+- Deleting a session or a user cascades to messages and usage rows.
+- `knowledge_chunks` is created by Flyway, not Spring AI (`initialize-schema=false`). Its 384 dimensions match `intfloat/multilingual-e5-small` (ADR-0006); a different embedding model needs a migration and a full re-ingest.
+- Chunk metadata (`documentId`, `chunkIndex`, `language`, `crops`, `topics`, `licence`, `title`, `url`) supports filtering and source attribution.
+- Only the ingestion command writes the knowledge tables; the chat endpoints read them.
+- The application role gets data-only access through the existing `afterMigrate.sql` callback.

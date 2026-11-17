@@ -1,0 +1,43 @@
+{
+  "_status": "DRAFT - needs native-speaker review",
+  "app": { "tagline": "உங்கள் வயலுக்கு புத்திசாலித்தனமான உதவி" },
+  "nav": {
+    "dashboard": "முகப்பு",
+    "newRecommendation": "பயிர் ஆலோசனை",
+    "history": "என் ஆலோசனை வரலாறு",
+    "chat": "AgriGenius இடம் கேளுங்கள்",
+    "logout": "வெளியேறு",
+    "language": "மொழி",
+    "menu": "பட்டியல்"
+  },
+  "common": {
+    "loading": "ஏற்றுகிறது…",
+    "retry": "மீண்டும் முயற்சிக்கவும்",
+    "cancel": "ரத்து செய்",
+    "yes": "ஆம்",
+    "no": "இல்லை",
+    "select": "தேர்ந்தெடுக்கவும்…"
+  },
+  "login": {
+    "title": "உள்நுழைக",
+    "mobile": "கைபேசி எண்",
+    "password": "கடவுச்சொல்",
+    "submit": "உள்நுழைக",
+    "registerLink": "கணக்கை உருவாக்கவும்"
+  },
+  "register": {
+    "title": "உங்கள் கணக்கை உருவாக்கவும்",
+    "fullName": "முழு பெயர்",
+    "mobile": "கைபேசி எண்",
+    "password": "கடவுச்சொல்",
+    "language": "விருப்ப மொழி",
+    "state": "மாநிலம்",
+    "district": "மாவட்டம்",
+    "village": "கிராமம்",
+    "submit": "கணக்கை உருவாக்கவும்"
+  },
+  "validation": { "required": "தயவுசெய்து இதை நிரப்பவும்." },
+  "dashboard": { "greeting": "வணக்கம், {name}", "newRecTitle": "பயிர் ஆலோசனை பெறுக", "chatTitle": "கேள்வி கேளுங்கள்" },
+  "chat": { "title": "AgriGenius இடம் கேளுங்கள்", "newChat": "புதிய உரையாடல்", "send": "அனுப்பு", "placeholder": "உங்கள் கேள்வியை எழுதுங்கள்…" },
+  "errors": { "INVALID_CREDENTIALS": "கைபேசி எண் அல்லது கடவுச்சொல் தவறானது." }
+}

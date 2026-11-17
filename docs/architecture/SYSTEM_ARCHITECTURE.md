@@ -53,7 +53,7 @@ GET  /api/farmers/me    ─► BearerTokenAuthenticationFilter ─► JwtDecoder
 - ML integration: `integration/ml/MlServiceClient` (port) with a `RestClient` adapter, 2 s connect / 5 s read timeouts. The `mlService` health component reports `DEGRADED` (never `DOWN`) when the ML service is unreachable and is excluded from readiness, so the backend keeps serving non-ML features.
 - Anonymous health results are cached for 10 s so public health checks cannot be used to flood the database or ML service.
 
-### Recommendation module (Milestone 3, in progress)
+### Recommendation module (Milestone 3, merged in PR #4)
 
 - `recommendation`: crop recommendation requests and results, the crop catalogue (`crops`), and the `CropModelClient` port with its RestClient adapter. Depends on `identity` (current user) and `integration/ml` settings; nothing depends on it yet.
 - Only `ROLE_FARMER` may call `/api/recommendations/**`. The user id always comes from the token; another farmer's recommendation id returns 404.
@@ -78,13 +78,40 @@ Angular (later) ──JWT──► Spring Boot  recommendation module
 - Trust boundary: the browser never reaches the ML service. The backend authenticates every ML call with the shared `X-Internal-Api-Key` (ADR-0004); the ML service listens only on loopback and rejects calls without the key.
 - Results are labelled `DEMO_PUBLIC_DATASET` and carry an expert-confirmation advisory (ADR-0005). Economics are not provided.
 
+### Chat and knowledge modules (agriculture chatbot, in progress; ADR-0006, ADR-0007)
+
+- `chat`: sessions, messages, chat memory (own `ChatMemoryRepository` over `chat_messages`), the Spring AI `ChatClient`, farmer-scoped tools, rate limits and the daily token budget. Depends on `identity`, `farmer` and `recommendation` application services.
+- `knowledge`: the reviewed corpus (`knowledge/manifest.yaml`), ingestion (chunking, in-process multilingual embeddings), and retrieval from pgvector (`knowledge_chunks`, HNSW cosine).
+
+```
+POST message ─► validate + ownership (session.user_id = token sub) ─► rate limit + daily budget
+  ─► save USER message
+  ─► retrieve: embed question (multilingual, in-process) ─► pgvector top-5, cosine ≥ threshold, status ACTIVE
+  ─► ChatClient (Spring AI, Anthropic) with:
+       fixed system prompt (language, scope, citation and uncertainty rules)   [prompt-cached]
+       last 10 messages of THIS session
+       <retrieved_sources> … </retrieved_sources>   untrusted reference text, never instructions
+       tools: getMyProfile, getMyCropRecommendations(limit ≤ 5), getMyCropRecommendation(id)
+  ─► save ASSISTANT message (sources, tool names, token usage); update daily usage
+```
+
+- **Trust boundaries:** the LLM provider (Anthropic) is an external service. `ANTHROPIC_API_KEY` exists only in the backend environment; the browser never sees it or talks to the provider. Chat text is sent to the provider (privacy note, decision C7); embeddings are computed inside the backend.
+- **Tools** take no user id: identity comes from the verified JWT, they are read-only, and they return allowlisted fields only. Farm, soil and weather tools are not registered until those modules exist.
+- With no API key configured, chat returns `503 CHAT_DISABLED` and the rest of the backend runs normally.
+
+## Angular frontend (`frontend/`, in progress; ADR-0008)
+
+- Angular 22 standalone app. The browser talks only to the Spring Boot API (`/api`, proxied by `ng serve` in development); it never reaches the ML service or the LLM provider.
+- Screens: register, login, profile, crop recommendation (form, results, history) and chat. Every screen has loading, empty, error and success states.
+- The access token is held in memory and `sessionStorage`; the in-house i18n covers en/hi/te/kn/ta (Indic translations are drafts pending review).
+
 ## Python ML service (`ml-service/`)
 - FastAPI application created by `create_app()` in `app/main.py`; feature routers live under `app/api/routes/`, configuration in `app/core/config.py`.
 - Configuration comes only from `ML_*` environment variables (optionally `ml-service/.env`, gitignored) and is validated at startup.
 - Binds to `127.0.0.1:8001` by default so it is unreachable from other machines. Changing `ML_HOST` to a non-loopback address must be paired with network isolation and service-to-service authentication.
-- Exposes `GET /health` (liveness) and `GET /health/ready` (model loaded and checksum verified), plus the key-protected `/v1/crop-recommendation/predict` and `/v1/crop-recommendation/model` (Milestone 3, in progress).
+- Exposes `GET /health` (liveness) and `GET /health/ready` (model loaded and checksum verified), plus the key-protected `/v1/crop-recommendation/predict` and `/v1/crop-recommendation/model` (Milestone 3).
 - Model artifacts live in `ml-service/models/crop_recommendation/<version>/` (`model.joblib` + `metadata.json`); the SHA-256 is verified before loading because joblib files can execute code (ADR-0005).
 - OpenAPI docs are disabled when `ML_APP_ENV=production`.
 
 ## Architecture decision records
-Create `docs/architecture/decisions/ADR-NNNN-*.md` for significant choices (ADR-0001 modular monolith, ADR-0002 Spring Boot 4.1, ADR-0003 JWT authentication, ADR-0004 internal service auth, ADR-0005 crop model and dataset). Each ADR should include context, decision, alternatives, consequences and date.
+Create `docs/architecture/decisions/ADR-NNNN-*.md` for significant choices (ADR-0001 modular monolith, ADR-0002 Spring Boot 4.1, ADR-0003 JWT authentication, ADR-0004 internal service auth, ADR-0005 crop model and dataset, ADR-0006 LLM provider and RAG, ADR-0007 prompt injection and tool policy, ADR-0008 Angular frontend). Each ADR should include context, decision, alternatives, consequences and date.

@@ -3,11 +3,11 @@
 > This is the source of truth for implementation status. Update it after every completed task. Do not mark work complete without test evidence.
 
 ## Current stage
-- Overall: Phase 1 – Milestone 3 (crop recommendation) in progress
+- Overall: Phase 1 – agriculture chatbot and Angular UI in progress
 - Active phase: Phase 1
-- Active milestone: M3 Crop recommendation (branch `feature/crop-recommendation`)
-- Last verified update: 2026-11-17 – farmer registration and authentication merged (PR #3); backend and ML CI passed on `main` (`6dd1cea`)
-- Current blocker: confirmation of the crop dataset's licence before a real model is trained (ADR-0005, Q1). Angular project not yet created. Local machine needs the JVM socket-directory workaround to run the backend (see DEVELOPMENT.md).
+- Active milestone: M5 Agriculture chatbot, built before M4 weather by decision C6, plus the Angular UI (branch `feature/agriculture-chatbot`)
+- Last verified update: 2026-11-17 – AI crop recommendation merged (PR #4); backend and ML CI (incl. dataset checksum and retraining) passed on `main` (`fbc0681`)
+- Current blocker: `ANTHROPIC_API_KEY` not configured, so the live spike and live evaluation are pending (chat is built and tested offline). Knowledge sources and licences to be chosen by the owner (C3). Local machine needs the JVM socket-directory workaround to run the backend (see DEVELOPMENT.md).
 
 ## Phase status
 
@@ -19,19 +19,19 @@
 
 ## Milestones
 - [ ] M0 Plan and repository setup
-- [ ] M1 Phase 1 foundation (ML service and Spring Boot foundations done; Angular pending)
+- [ ] M1 Phase 1 foundation (ML service and Spring Boot foundations done; Angular app in progress)
 - [ ] M2 Identity, farmer and farms (registration, login and profile done in PR #3; profile update and farms deferred by Q2)
-- [ ] M3 Crop recommendation (in progress)
-- [ ] M4 Weather and alerts
-- [ ] M5 Agriculture chatbot
+- [x] M3 Crop recommendation (merged in PR #4)
+- [ ] M4 Weather and alerts (after the chatbot, decision C6)
+- [ ] M5 Agriculture chatbot (in progress)
 - [ ] Phase 1 exit review
 
 ## Module tracking
 | Module | Status | Evidence / notes |
 |---|---|---|
 | Farmer registration/profile/farms | Partly done | Registration, login, JWT and `GET /api/farmers/me` merged (PR #3); profile update and farms not started (deferred by Q2) |
-| AI crop recommendation | In progress | Backend + ML service (M3, branch `feature/crop-recommendation`); UI deferred until the Angular app exists (Q7) |
-| AI agriculture chatbot | Not started | |
+| AI crop recommendation | Done (backend + ML) | Merged in PR #4; Angular screens in progress |
+| AI agriculture chatbot | In progress | Branch `feature/agriculture-chatbot`; live model pending an API key |
 | Weather forecast and smart alerts | Not started | |
 
 ## Recent completed work
@@ -64,8 +64,7 @@
   - Least-privilege database role (D8): Flyway's `afterMigrate.sql` callback; the backend connects as `DB_USERNAME`, Flyway as `POSTGRES_USER`.
   - CI: backend and ML workflows passed on PR #3 and on `main` after the merge (`6dd1cea`).
 
-## In progress
-- **AI crop recommendation (M3, branch `feature/crop-recommendation`).** Spring Boot `recommendation` module (`POST /api/recommendations`, `GET /api/recommendations/history`, `GET /api/recommendations/{id}`), Flyway V3 (`crops`, `crop_recommendation_requests`, `crop_recommendation_results`), private ML endpoint `POST /v1/crop-recommendation/predict` protected by `X-Internal-Api-Key` (ADR-0004), calibrated Random Forest / XGBoost model with checksum-verified artifact (ADR-0005), shared contract fixtures in `docs/api/contracts/crop-recommendation/`.
+- **AI crop recommendation (M3, merged in PR #4, 2026-11-17).** Spring Boot `recommendation` module (`POST /api/recommendations`, `GET /api/recommendations/history`, `GET /api/recommendations/{id}`), Flyway V3 (`crops`, `crop_recommendation_requests`, `crop_recommendation_results`), private ML endpoint `POST /v1/crop-recommendation/predict` protected by `X-Internal-Api-Key` (ADR-0004), calibrated Random Forest / XGBoost model with checksum-verified artifact (ADR-0005), shared contract fixtures in `docs/api/contracts/crop-recommendation/`.
   - Acceptance criteria:
     - Only `FARMER` tokens can create or read recommendations; the user id comes from the token; another farmer's id returns `404`.
     - Inputs are validated (ranges and enums from the API contract) → `400` with field errors; values outside the training range produce `INPUT_OUTSIDE_TRAINING_RANGE` warnings, not errors.
@@ -77,9 +76,43 @@
     - Training is reproducible (fixed seed) and documented in the model card; tests use a synthetic fixture dataset.
     - 30 recommendation requests per user per hour (`429` beyond that).
     - Logs contain no tokens, API keys or input values; all existing tests still pass; docs updated.
-  - Evidence (2026-11-17, branch `feature/crop-recommendation`, not yet committed): backend `./mvnw -B verify` → 243 tests, 0 failures (incl. 6 Testcontainers recommendation integration tests: persistence, JSONB, model traceability, LOW_CONFIDENCE, ML outage → FAILED + 503, ownership 404, history isolation, app-role data-only access); ML service `pytest` → 73 passed (API key, checksum-verified loading, predict/model/readiness, contract fixtures, training determinism, leakage control, quality floor).
+  - Evidence (2026-11-17, commit `ef06fa2`): backend `./mvnw -B verify` → 243 tests, 0 failures (incl. 6 Testcontainers recommendation integration tests: persistence, JSONB, model traceability, LOW_CONFIDENCE, ML outage → FAILED + 503, ownership 404, history isolation, app-role data-only access); ML service `pytest` → 73 passed (API key, checksum-verified loading, predict/model/readiness, contract fixtures, training determinism, leakage control, quality floor).
   - Model 1.0.0 trained on the committed dataset (SHA-256 `808e1d84…d77c`, Apache 2.0): Random Forest, CV macro-F1 0.9937 ± 0.0056, hold-out macro-F1 0.9932 (3/440 errors). Labelled DEMO_PUBLIC_DATASET; not field-validated (see MODEL_CARDS.md).
   - Two-service smoke test on the local DB (backup taken first): V3 applied; ML service loaded the checksum-verified model; through the backend only: typical rice inputs → COMPLETED, rice 0.937 HIGH; extreme inputs → LOW_CONFIDENCE with training-range warnings and KVK escalation; invalid → 400 with 4 field errors; history and own GET 200; no token 401; ML predict without key 401; logs free of passwords, tokens, mobile numbers and feature values. Smoke-test accounts deleted.
+  - CI: backend and ML workflows (incl. the dataset checksum and retraining with a 0.90 macro-F1 floor) passed on PR #4 and on `main` after the merge (`fbc0681`).
+
+## In progress
+- **AI agriculture chatbot (spec milestone M5, built before M4 weather by decision C6; branch `feature/agriculture-chatbot`).** Spring AI 2.0.2 with Claude (`claude-opus-5-5`, effort low), in-process multilingual embeddings, RAG over pgvector, farmer-owned sessions and history, read-only farmer-scoped tools (ADR-0006, ADR-0007).
+  - Acceptance criteria:
+    - All chat endpoints require a FARMER token; another farmer's session returns `404`; deleting a session removes its messages.
+    - Messages are validated (1–2,000 characters, control characters stripped; 200 per session; 50 active sessions).
+    - Rate limits: 20 messages per 10 minutes (`429 TOO_MANY_REQUESTS`), 40 per day (`429 CHAT_DAILY_LIMIT_REACHED`); global daily token budget; 1,024 output tokens per answer.
+    - Answers cite retrieved sources; below the similarity threshold the status is `NO_SOURCES` with a KVK referral; out-of-scope requests are `REFUSED`; provider failures are `FAILED` with `503 CHAT_PROVIDER_UNAVAILABLE`.
+    - Tools take no user id, are read-only, return allowlisted fields only, and cannot reach another farmer's data; farm, soil and weather tools are not registered.
+    - Retrieved text and tool output are wrapped as untrusted data; injection fixtures are tested.
+    - Without `ANTHROPIC_API_KEY` the app starts and chat returns `503 CHAT_DISABLED`; the key never reaches the browser or logs; message text is never logged.
+    - Knowledge ingestion enforces the manifest, licence allowlist and checksums; tests use a clearly labelled synthetic corpus.
+    - Answers in en/hi/te/kn/ta are checked in the opt-in live evaluation before Indic quality is relied on.
+    - All existing tests still pass; docs updated.
+- **Angular UI (`frontend/`, ADR-0008).** Previously deferred by Q7; started at the owner's request. Register, login, profile, crop recommendation (form, results, history) and chat, with loading, empty, error and success states; responsive and accessible; en/hi/te/kn/ta with draft Indic translations pending review.
+  - Evidence (2026-11-17, branch `feature/agriculture-chatbot`, not yet committed): backend `./mvnw -B verify` → **360 tests, 0 failures** (chat API + service limits/ownership, assistant prompt/tools/citation rules, knowledge manifest/chunking/retrieval, Testcontainers: full chat flow with a scripted model, injection text escaped, logs free of message text, provider failure → FAILED/503, chat disabled → 503 with nothing stored, cross-farmer 404, pgvector ingestion/retrieval, app-role data-only access); frontend `ng test` → 48 passed, `ng build` OK (325.8 kB initial, 91.3 kB transferred); ML service unchanged (73 passed on main).
+  - Real embedding model verified locally (multilingual-e5-small ONNX, 384 dims, pinned commit + SHA-256); cross-lingual check ranks the relevant passage first for en/hi/te. Threshold 0.75 is provisional and too permissive (unrelated text scores ~0.72–0.77).
+  - Smoke test on the local DB (backup first, port 8081 with the owner's `.env`): V4 applied; register/login, create/list chat sessions OK; send → 503 CHAT_DISABLED (no API key) with 0 messages stored; no token → 401; connections as `agrigenius_app` only; smoke account deleted.
+  - Not yet done: live spike and live evaluation (need `ANTHROPIC_API_KEY`; ~$1 approved), knowledge sources (owner decision C3, candidates in docs/knowledge/CANDIDATE_SOURCES.md), UI checked in a real browser, native review of hi/te/kn/ta UI strings.
+
+## Decisions (agriculture chatbot, approved 2026-11-17)
+
+| # | Decision | Outcome |
+|---|---|---|
+| C1 | Model | Claude via Spring AI's Anthropic starter, `claude-opus-5-5`, effort `low`; `CHAT_MODEL` configurable. About $0.024 per message (Sonnet 5.5 about $0.012, Haiku 5.5 about $0.0006; owner's choice) |
+| C2 | Embeddings | In-process ONNX `intfloat/multilingual-e5-small` (384 dims) via Spring AI Transformers |
+| C3 | Knowledge sources | Owner chooses the initial set. Licence allowlist: public domain, CC-BY-4.0, CC-BY-SA-4.0, GODL-India; FAO CC-BY-NC-SA only while non-commercial. Synthetic test corpus until then. |
+| C4 | Response mode | Non-streaming JSON in v1; SSE with the UI later |
+| C5 | Fertilizer and market questions | General, sourced information only; no field-specific doses or prices |
+| C6 | Weather | Chatbot first, without weather; the weather tool is added with M4 |
+| C7 | Privacy | Chat text goes to Anthropic; disclosure in the API docs now and in the UI later; no personal identifiers in tool output |
+| C8 | Spending | About $1 approved for the spike and the first live evaluation; CI never calls the live model |
+| C9 | Limits | 20 messages per 10 minutes, 40 per day, 1,024 output tokens, global daily token budget |
 
 ## Decisions (Milestone 3 crop recommendation, approved 2026-11-17)
 
@@ -109,13 +142,15 @@
 
 ## Blockers and decisions needed
 - ~~Dataset licence~~ Resolved 2026-11-17: Apache 2.0 (Kaggle metadata); dataset committed with NOTICE and checksum; model 1.0.0 trained (artifact generated, not committed).
-- Service-to-service authentication between Spring Boot and the ML service: **in progress** (ADR-0004, shared `X-Internal-Api-Key`).
-- Local `.env` files need the shared `ML_SERVICE_API_KEY` (root) / `ML_INTERNAL_API_KEY` (`ml-service/.env`) once M3 lands (see DEVELOPMENT.md).
-- Deferred by approved decisions: farm CRUD and profile update (Q2), Angular UI (Q7), economics (Q5), password recovery and refresh tokens (D1).
+- ~~Service-to-service authentication~~ Done in M3 (ADR-0004 implemented: shared `X-Internal-Api-Key`, constant-time check, loopback binding).
+- **`ANTHROPIC_API_KEY` not configured:** the live spike (Spring AI 2.0.2 + `claude-opus-5-5`) and the first live evaluation are pending; about $1 is approved (C8).
+- **Knowledge sources:** the owner chooses the initial documents and licences (C3); a labelled synthetic corpus is used until then.
+- Local `.env` files need the shared `ML_SERVICE_API_KEY` (root) / `ML_INTERNAL_API_KEY` (`ml-service/.env`) to run M3 locally (see DEVELOPMENT.md).
+- Deferred by approved decisions: farm CRUD and profile update (Q2), economics (Q5), password recovery and refresh tokens (D1), weather (C6). The Angular UI deferred by Q7 is now in progress.
 - Local `.env` must gain `JWT_SECRET`, `DB_USERNAME` and `DB_PASSWORD` before the backend starts (see DEVELOPMENT.md).
 - This machine's JVM cannot create NIO sockets under `AppData\Local`; set `JDK_JAVA_OPTIONS=-Djdk.net.unixdomain.tmpdir=C:\dev\tmp` or find the blocking security setting (see DEVELOPMENT.md).
 - `JAVA_HOME` on this machine points at a missing JDK 17; set it to the JDK 21 path.
 - Starlette `TestClient` deprecation warning recommends `httpx2`; decide whether to switch dev dependency.
 
 ## Next recommended task
-Finish M3: add the dataset (licence confirmed Apache 2.0), train the v1.0.0 model (artifact generated, not committed), then run the full backend and ML test suites and a smoke test with both services against the local database. After M3, plan the remaining M2 work (farm CRUD and profile update) so recommendations can be linked to farms.
+Finish the chatbot and Angular UI on `feature/agriculture-chatbot`. Once `ANTHROPIC_API_KEY` is added, run the live spike and evaluation (within the approved ~$1). Then M4 weather and alerts (adds the chatbot's weather tool), and the remaining M2 work (farm CRUD and profile update).

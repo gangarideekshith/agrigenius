@@ -1,0 +1,48 @@
+{
+  "_about": "Gold questions for the AgriGenius chatbot live evaluation. Phase 1 topics only. hi/te/kn/ta wording is DRAFT and needs native-speaker review. expectedSourceDocumentIds stay null until the owner approves knowledge sources.",
+  "questions": [
+    { "id": "en-01", "language": "en", "draft": false, "question": "How should I prepare my field before sowing paddy?", "expectTopics": ["rice", "land-preparation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "en-02", "language": "en", "draft": false, "question": "My rice leaves have brown spots with yellow edges. What could it be?", "expectTopics": ["rice", "disease"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "en-03", "language": "en", "draft": false, "question": "How often should I irrigate maize in the vegetative stage?", "expectTopics": ["maize", "irrigation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "en-04", "language": "en", "draft": false, "question": "What does soil pH mean and why does it matter for crops?", "expectTopics": ["soil", "ph"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "en-05", "language": "en", "draft": false, "question": "Which district is saved in my profile?", "expectTopics": ["profile"], "expectBehaviour": "USE_PROFILE_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "en-06", "language": "en", "draft": false, "question": "What crops did my last recommendation suggest?", "expectTopics": ["crop-recommendation"], "expectBehaviour": "USE_RECOMMENDATION_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "en-07", "language": "en", "draft": false, "question": "How do I recognise stem borer damage in rice?", "expectTopics": ["rice", "pest"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "en-08", "language": "en", "draft": false, "question": "What is drip irrigation and when is it useful?", "expectTopics": ["irrigation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "en-09", "language": "en", "draft": false, "question": "How do I grow dragon fruit on Mars?", "expectTopics": ["out-of-knowledge"], "expectBehaviour": "NO_SOURCES_OK", "expectedSourceDocumentIds": null },
+
+    { "id": "hi-01", "language": "hi", "draft": true, "question": "धान बोने से पहले खेत कैसे तैयार करें?", "expectTopics": ["rice", "land-preparation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "hi-02", "language": "hi", "draft": true, "question": "मेरी गेहूं की पत्तियों पर पीले धब्बे हैं, यह क्या हो सकता है?", "expectTopics": ["wheat", "disease"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "hi-03", "language": "hi", "draft": true, "question": "मक्का की फसल में कितनी बार सिंचाई करनी चाहिए?", "expectTopics": ["maize", "irrigation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "hi-04", "language": "hi", "draft": true, "question": "मिट्टी का पीएच क्या होता है?", "expectTopics": ["soil", "ph"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "hi-05", "language": "hi", "draft": true, "question": "मेरी प्रोफ़ाइल में कौन सा राज्य दर्ज है?", "expectTopics": ["profile"], "expectBehaviour": "USE_PROFILE_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "hi-06", "language": "hi", "draft": true, "question": "मेरी पिछली फसल सिफारिश में कौन सी फसलें थीं?", "expectTopics": ["crop-recommendation"], "expectBehaviour": "USE_RECOMMENDATION_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "hi-07", "language": "hi", "draft": true, "question": "चने की फसल में कौन से कीट आम हैं?", "expectTopics": ["chickpea", "pest"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "hi-08", "language": "hi", "draft": true, "question": "चांद पर आलू कैसे उगाएं?", "expectTopics": ["out-of-knowledge"], "expectBehaviour": "NO_SOURCES_OK", "expectedSourceDocumentIds": null },
+
+    { "id": "te-01", "language": "te", "draft": true, "question": "వరి నాటడానికి ముందు పొలాన్ని ఎలా సిద్ధం చేయాలి?", "expectTopics": ["rice", "land-preparation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "te-02", "language": "te", "draft": true, "question": "నా వరి ఆకులపై గోధుమ రంగు మచ్చలు ఉన్నాయి. ఇది ఏమిటి?", "expectTopics": ["rice", "disease"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "te-03", "language": "te", "draft": true, "question": "పత్తి పంటకు ఎంత తరచుగా నీరు పెట్టాలి?", "expectTopics": ["cotton", "irrigation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "te-04", "language": "te", "draft": true, "question": "నేల పీహెచ్ అంటే ఏమిటి?", "expectTopics": ["soil", "ph"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "te-05", "language": "te", "draft": true, "question": "నా ప్రొఫైల్‌లో ఏ జిల్లా ఉంది?", "expectTopics": ["profile"], "expectBehaviour": "USE_PROFILE_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "te-06", "language": "te", "draft": true, "question": "నా చివరి పంట సిఫార్సులో ఏ పంటలు ఉన్నాయి?", "expectTopics": ["crop-recommendation"], "expectBehaviour": "USE_RECOMMENDATION_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "te-07", "language": "te", "draft": true, "question": "వరిలో కాండం తొలుచు పురుగును ఎలా గుర్తించాలి?", "expectTopics": ["rice", "pest"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "te-08", "language": "te", "draft": true, "question": "అంగారక గ్రహంపై మామిడి ఎలా పండించాలి?", "expectTopics": ["out-of-knowledge"], "expectBehaviour": "NO_SOURCES_OK", "expectedSourceDocumentIds": null },
+
+    { "id": "kn-01", "language": "kn", "draft": true, "question": "ಭತ್ತ ಬಿತ್ತುವ ಮೊದಲು ಹೊಲವನ್ನು ಹೇಗೆ ಸಿದ್ಧಪಡಿಸಬೇಕು?", "expectTopics": ["rice", "land-preparation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "kn-02", "language": "kn", "draft": true, "question": "ರಾಗಿ ಬೆಳೆಗೆ ಎಷ್ಟು ಬಾರಿ ನೀರು ಹಾಯಿಸಬೇಕು?", "expectTopics": ["millet", "irrigation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "kn-03", "language": "kn", "draft": true, "question": "ಮಣ್ಣಿನ ಪಿಎಚ್ ಎಂದರೇನು?", "expectTopics": ["soil", "ph"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "kn-04", "language": "kn", "draft": true, "question": "ನನ್ನ ಪ್ರೊಫೈಲ್‌ನಲ್ಲಿ ಯಾವ ರಾಜ್ಯ ಇದೆ?", "expectTopics": ["profile"], "expectBehaviour": "USE_PROFILE_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "kn-05", "language": "kn", "draft": true, "question": "ನನ್ನ ಕೊನೆಯ ಬೆಳೆ ಶಿಫಾರಸಿನಲ್ಲಿ ಯಾವ ಬೆಳೆಗಳಿದ್ದವು?", "expectTopics": ["crop-recommendation"], "expectBehaviour": "USE_RECOMMENDATION_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "kn-06", "language": "kn", "draft": true, "question": "ಟೊಮೆಟೊ ಎಲೆಗಳು ಮುದುರುತ್ತಿವೆ, ಕಾರಣ ಏನಿರಬಹುದು?", "expectTopics": ["tomato", "disease"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "kn-07", "language": "kn", "draft": true, "question": "ಚಂದ್ರನ ಮೇಲೆ ತೆಂಗು ಹೇಗೆ ಬೆಳೆಯುವುದು?", "expectTopics": ["out-of-knowledge"], "expectBehaviour": "NO_SOURCES_OK", "expectedSourceDocumentIds": null },
+
+    { "id": "ta-01", "language": "ta", "draft": true, "question": "நெல் விதைப்பதற்கு முன் வயலை எப்படி தயார் செய்வது?", "expectTopics": ["rice", "land-preparation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "ta-02", "language": "ta", "draft": true, "question": "என் நெல் இலைகளில் பழுப்பு நிற புள்ளிகள் உள்ளன. இது என்ன?", "expectTopics": ["rice", "disease"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "ta-03", "language": "ta", "draft": true, "question": "கரும்புக்கு எவ்வளவு அடிக்கடி நீர் பாய்ச்ச வேண்டும்?", "expectTopics": ["sugarcane", "irrigation"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "ta-04", "language": "ta", "draft": true, "question": "மண்ணின் பிஎச் என்றால் என்ன?", "expectTopics": ["soil", "ph"], "expectBehaviour": "ANSWER_FROM_SOURCES", "expectedSourceDocumentIds": null },
+    { "id": "ta-05", "language": "ta", "draft": true, "question": "என் சுயவிவரத்தில் எந்த மாவட்டம் உள்ளது?", "expectTopics": ["profile"], "expectBehaviour": "USE_PROFILE_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "ta-06", "language": "ta", "draft": true, "question": "என் கடைசி பயிர் பரிந்துரையில் எந்த பயிர்கள் இருந்தன?", "expectTopics": ["crop-recommendation"], "expectBehaviour": "USE_RECOMMENDATION_TOOL", "expectedSourceDocumentIds": null },
+    { "id": "ta-07", "language": "ta", "draft": true, "question": "செவ்வாய் கிரகத்தில் வாழை எப்படி வளர்ப்பது?", "expectTopics": ["out-of-knowledge"], "expectBehaviour": "NO_SOURCES_OK", "expectedSourceDocumentIds": null }
+  ]
+}
