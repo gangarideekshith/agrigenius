@@ -65,8 +65,8 @@ import { ErrorBanner, Loading } from '../../shared/state-views';
               <ul class="explanation">
                 @for (e of c.explanation; track e.feature) {
                   <li [class]="'fit-' + e.fit">
-                    <strong>{{ 'features.' + e.feature | t }}</strong>: {{ e.value | number: '1.0-2' }} —
-                    {{ 'rec.fit' + e.fit | t: { min: (e.typicalRange[0] | number: '1.0-1'), max: (e.typicalRange[1] | number: '1.0-1') } }}
+                    <strong>{{ 'featureLabels.' + e.feature | t }}</strong>: {{ e.value | number: '1.0-2' }} —
+                    {{ 'rec.fit' + e.fit | t: { min: (e.typicalRange[0] | number: '1.0-2'), max: (e.typicalRange[1] | number: '1.0-2') } }}
                   </li>
                 }
               </ul>

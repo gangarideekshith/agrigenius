@@ -77,6 +77,29 @@ public class UserAccountService {
         return repository.findByMobileNumber(normalizedMobile).map(AccountView::of);
     }
 
+    /**
+     * Changes (or clears, with {@code null}) the account email. Joins the caller's transaction.
+     *
+     * @throws AccountAlreadyExistsException if another account already uses the email
+     */
+    @Transactional
+    public AccountView changeEmail(UUID id, String email) {
+        UserAccount account = repository.findById(id).filter(UserAccount::isActive)
+                .orElseThrow(com.agrigenius.common.error.AuthenticationRequiredException::new);
+        if (java.util.Objects.equals(account.getEmail(), email)) {
+            return AccountView.of(account);
+        }
+        if (email != null && repository.existsByEmail(email)) {
+            throw new AccountAlreadyExistsException(DUPLICATE_EMAIL);
+        }
+        account.changeEmail(email);
+        try {
+            return AccountView.of(repository.saveAndFlush(account));
+        } catch (DataIntegrityViolationException raceLost) {
+            throw new AccountAlreadyExistsException(DUPLICATE_EMAIL);
+        }
+    }
+
     @Transactional
     public void recordSuccessfulLogin(UUID id) {
         repository.findById(id).ifPresent(account -> account.recordLogin(clock.instant().truncatedTo(java.time.temporal.ChronoUnit.MICROS)));

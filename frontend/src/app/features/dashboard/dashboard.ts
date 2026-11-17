@@ -2,9 +2,9 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { asApiError } from '../../core/api/api-error';
-import { FarmerApi } from '../../core/api/api.services';
+import { FarmerApi, RecommendationApi } from '../../core/api/api.services';
 import { ErrorView, describeError } from '../../core/api/error-message';
-import { FarmerProfile } from '../../core/api/models';
+import { FarmerProfile, RecommendationSummary } from '../../core/api/models';
 import { I18nService, TranslatePipe } from '../../core/i18n/i18n.service';
 import { ErrorBanner, Loading } from '../../shared/state-views';
 
@@ -28,6 +28,25 @@ import { ErrorBanner, Loading } from '../../shared/state-views';
           <div><dt>{{ 'dashboard.language' | t }}</dt><dd>{{ 'languages.' + p.preferredLanguage | t }}</dd></div>
           <div><dt>{{ 'dashboard.memberSince' | t }}</dt><dd>{{ p.createdAt | date: 'mediumDate' }}</dd></div>
         </dl>
+        <a class="btn btn-secondary" routerLink="/profile">{{ 'dashboard.editProfile' | t }}</a>
+      </section>
+
+      <section class="card" aria-labelledby="latest-rec-title">
+        <h2 id="latest-rec-title">{{ 'dashboard.latestRecTitle' | t }}</h2>
+        @if (latestLoading()) {
+          <app-loading />
+        } @else if (latestError()) {
+          <p class="state state-error" role="alert">{{ 'dashboard.latestRecError' | t }}</p>
+        } @else if (latest(); as r) {
+          <p>
+            <strong>{{ r.topCrop?.name ?? ('rec.statusLabel' + r.status | t) }}</strong>
+            @if (r.topConfidence) { · {{ 'rec.confidence' + r.topConfidence | t }} }
+            · {{ r.requestedAt | date: 'medium' }}
+          </p>
+          <a class="btn btn-secondary" [routerLink]="['/recommendations', r.id]">{{ 'dashboard.latestRecOpen' | t }}</a>
+        } @else {
+          <p class="state state-empty">{{ 'dashboard.latestRecEmpty' | t }}</p>
+        }
       </section>
 
       <h2>{{ 'dashboard.shortcutsTitle' | t }}</h2>
@@ -53,14 +72,35 @@ import { ErrorBanner, Loading } from '../../shared/state-views';
 })
 export class DashboardPage implements OnInit {
   private readonly farmers = inject(FarmerApi);
+  private readonly recommendations = inject(RecommendationApi);
   private readonly i18n = inject(I18nService);
 
   readonly profile = signal<FarmerProfile | null>(null);
   readonly loading = signal(true);
   readonly error = signal<ErrorView | null>(null);
+  readonly latest = signal<RecommendationSummary | null>(null);
+  readonly latestLoading = signal(true);
+  readonly latestError = signal(false);
 
   ngOnInit(): void {
     this.load();
+    this.loadLatest();
+  }
+
+  /** Most recent crop recommendation (real history API, page size 1). */
+  loadLatest(): void {
+    this.latestLoading.set(true);
+    this.latestError.set(false);
+    this.recommendations.history(0, 1).subscribe({
+      next: (page) => {
+        this.latest.set(page.items[0] ?? null);
+        this.latestLoading.set(false);
+      },
+      error: () => {
+        this.latestError.set(true);
+        this.latestLoading.set(false);
+      },
+    });
   }
 
   load(): void {

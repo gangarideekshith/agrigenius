@@ -140,6 +140,14 @@
 | D7 | Error `code` field | Added to all problem+json responses |
 | D8 | Least-privilege DB role | Done in this milestone (Flyway as owner, app as `agrigenius_app`) |
 
+
+## Stage 1 completion (2026-11-17, branch `feature/stage1-ui`, not yet committed)
+
+- Added `PUT /api/farmers/me` (profile edit; mobile immutable; email unique) and the Angular `/profile` page; dashboard shows the latest real crop advice; chat keeps conversations visible when the assistant is not configured; crop-advice comparisons show labelled units.
+- Evidence: backend `./mvnw -B verify` → 365 tests, 0 failures; ML `pytest` → 73 passed; frontend `ng test` → 56 passed, `ng build` OK (327 kB initial, 91.5 kB transferred).
+- Browser journey on the real stack (ML :8001, backend :8081 with the owner's `.env`, UI :4200; DB backed up first): register → login → dashboard → profile edit saved (verified in DB) → crop advice from the real model (rice 93.7 % HIGH) → chat session created → send answered CHAT_DISABLED (no API key, nothing stored) → session deleted. Test account removed afterwards.
+- Handoff and Stage 2/3 plan: `docs/AGRI_GENIUS_FUTURE_ROADMAP.md`.
+
 ## Blockers and decisions needed
 - ~~Dataset licence~~ Resolved 2026-11-17: Apache 2.0 (Kaggle metadata); dataset committed with NOTICE and checksum; model 1.0.0 trained (artifact generated, not committed).
 - ~~Service-to-service authentication~~ Done in M3 (ADR-0004 implemented: shared `X-Internal-Api-Key`, constant-time check, loopback binding).

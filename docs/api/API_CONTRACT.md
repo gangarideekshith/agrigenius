@@ -61,7 +61,7 @@ Other actuator endpoints are not exposed (`401`).
 | Auth | POST | `/api/auth/refresh` | Refresh tokens | Deferred (D1) |
 | Auth | POST | `/api/auth/forgot-password` | Password recovery | Deferred (D1) |
 | Farmer | GET | `/api/farmers/me` | Current profile | Implemented (PR #3) |
-| Farmer | PUT | `/api/farmers/me` | Update profile | Planned |
+| Farmer | PUT | `/api/farmers/me` | Update profile | Implemented (branch `feature/stage1-ui`) |
 | Farms | POST | `/api/farms` | Create farm | Planned |
 | Farms | GET | `/api/farms` | List accessible farms | Planned |
 | Farms | GET | `/api/farms/{id}` | Farm details | Planned |
@@ -138,6 +138,19 @@ Only `FARMER` accounts can self-register. `ADMIN`, `AGRICULTURAL_EXPERT`, `BUYER
 | `400` | `VALIDATION_FAILED` / `MALFORMED_REQUEST` |
 | `401` | `INVALID_CREDENTIALS`: "Invalid mobile number or password." Identical for an unknown number, a wrong password and a disabled account. |
 | `429` | `TOO_MANY_REQUESTS`, header `Retry-After` (5 failed logins per number or 20 auth requests per IP in 15 minutes) |
+
+### `PUT /api/farmers/me` (Bearer token, role `FARMER`)
+
+Replaces the editable fields of the caller's own profile (PUT semantics: omitted optional fields are cleared). The mobile number, role and status cannot be changed; unknown fields such as `mobileNumber` or `role` are ignored.
+
+```json
+{ "fullName": "Ravi Kumar", "preferredLanguage": "te", "email": "ravi@example.org",
+  "state": "Telangana", "district": "Warangal", "village": "Hanamkonda", "addressLine": "Near the tank" }
+```
+
+Validation: same as registration (`fullName` 2–100 letters, `preferredLanguage` en/hi/te/kn/ta, `email` valid ≤254, `state`/`district` ≤60, `village` ≤100) plus `addressLine` ≤200; text is trimmed, blanks become `null`, email is stored lowercase.
+
+Responses: **200** `FarmerProfileResponse` · **400** `VALIDATION_FAILED` · **401** `AUTHENTICATION_REQUIRED` · **403** `ACCESS_DENIED` (non-farmer) · **409** `ACCOUNT_ALREADY_EXISTS` (email used by another account, case-insensitive).
 
 ### `GET /api/farmers/me` (Bearer token, role `FARMER`)
 

@@ -18,12 +18,6 @@ export const MAX_MESSAGE_LENGTH = 2000;
     <h1 class="visually-hidden">{{ 'chat.title' | t }}</h1>
     @if (loadingSessions()) {
       <app-loading />
-    } @else if (disabled()) {
-      <section class="state state-empty chat-disabled" role="status">
-        <span class="tile-icon" aria-hidden="true">💬</span>
-        <h2>{{ 'chat.disabledTitle' | t }}</h2>
-        <p>{{ 'chat.disabledText' | t }}</p>
-      </section>
     } @else {
       <div class="chat-layout">
         <aside class="chat-sessions" [class.open]="sessionsOpen()" [attr.aria-label]="'chat.sessions' | t">
@@ -67,10 +61,21 @@ export const MAX_MESSAGE_LENGTH = 2000;
             }
           </div>
 
+          @if (disabled()) {
+            <section class="notice chat-disabled" role="status">
+              <strong>{{ 'chat.disabledTitle' | t }}</strong>
+              <p>{{ 'chat.disabledText' | t }}</p>
+            </section>
+          }
           <app-error-banner [error]="error()" />
 
           @if (!activeSession()) {
-            <div class="state state-empty"><p>{{ 'chat.selectOrStart' | t }}</p></div>
+            <div class="state state-empty">
+              <p>{{ 'chat.selectOrStart' | t }}</p>
+              <button type="button" class="btn btn-primary" [disabled]="creating()" (click)="newSession()">
+                {{ (creating() ? 'chat.creating' : 'chat.newChat') | t }}
+              </button>
+            </div>
           } @else {
             <div class="messages" aria-live="polite" aria-relevant="additions" #messageList>
               @if (loadingMessages()) {
@@ -178,7 +183,7 @@ export class ChatPage implements OnInit {
   readonly activeSession = computed(() => this.sessions().find((s) => s.id === this.activeId()) ?? null);
   readonly canSend = computed(() => {
     const text = this.draft().trim();
-    return !this.pending() && text.length > 0 && text.length <= MAX_MESSAGE_LENGTH;
+    return !this.pending() && !this.disabled() && text.length > 0 && text.length <= MAX_MESSAGE_LENGTH;
   });
 
   ngOnInit(): void {

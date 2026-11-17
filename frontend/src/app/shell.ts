@@ -40,6 +40,7 @@ import { I18nService, TranslatePipe, isLanguage } from './core/i18n/i18n.service
             >{{ 'nav.history' | t }}</a
           >
           <a routerLink="/chat" routerLinkActive="active" ariaCurrentWhenActive="page">{{ 'nav.chat' | t }}</a>
+          <a routerLink="/profile" routerLinkActive="active" ariaCurrentWhenActive="page">{{ 'nav.profile' | t }}</a>
         </nav>
       }
       <div class="topbar-actions">

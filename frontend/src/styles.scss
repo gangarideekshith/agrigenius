@@ -375,6 +375,11 @@ select[aria-invalid='true'] {
   border: 1px dashed var(--border);
   text-align: center;
 }
+.state-success {
+  background: #e8f5e9;
+  color: var(--green-dark, #1b5e20);
+  border: 1px solid var(--green-dark, #1b5e20);
+}
 .notice {
   background: var(--info-bg);
   padding: 0.6rem 0.8rem;

@@ -12,6 +12,7 @@ import {
   RecommendationResponse,
   RecommendationSummary,
   SendMessageResponse,
+  UpdateProfileRequest,
 } from './models';
 
 const API = environment.apiBaseUrl;
@@ -22,6 +23,10 @@ export class FarmerApi {
 
   me(): Observable<FarmerProfile> {
     return this.http.get<FarmerProfile>(`${API}/farmers/me`);
+  }
+
+  updateMe(request: UpdateProfileRequest): Observable<FarmerProfile> {
+    return this.http.put<FarmerProfile>(`${API}/farmers/me`, request);
   }
 }
 
