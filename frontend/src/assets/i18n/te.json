@@ -1,0 +1,43 @@
+{
+  "_status": "DRAFT - needs native-speaker review",
+  "app": { "tagline": "మీ పొలానికి తెలివైన సహాయం" },
+  "nav": {
+    "dashboard": "హోమ్",
+    "newRecommendation": "పంట సలహా",
+    "history": "నా సలహాల చరిత్ర",
+    "chat": "AgriGenius ని అడగండి",
+    "logout": "సైన్ అవుట్",
+    "language": "భాష",
+    "menu": "మెనూ"
+  },
+  "common": {
+    "loading": "లోడ్ అవుతోంది…",
+    "retry": "మళ్ళీ ప్రయత్నించండి",
+    "cancel": "రద్దు చేయండి",
+    "yes": "అవును",
+    "no": "కాదు",
+    "select": "ఎంచుకోండి…"
+  },
+  "login": {
+    "title": "సైన్ ఇన్ చేయండి",
+    "mobile": "మొబైల్ నంబర్",
+    "password": "పాస్‌వర్డ్",
+    "submit": "సైన్ ఇన్ చేయండి",
+    "registerLink": "ఖాతా సృష్టించండి"
+  },
+  "register": {
+    "title": "మీ ఖాతాను సృష్టించండి",
+    "fullName": "పూర్తి పేరు",
+    "mobile": "మొబైల్ నంబర్",
+    "password": "పాస్‌వర్డ్",
+    "language": "ఇష్టమైన భాష",
+    "state": "రాష్ట్రం",
+    "district": "జిల్లా",
+    "village": "గ్రామం",
+    "submit": "ఖాతా సృష్టించండి"
+  },
+  "validation": { "required": "దయచేసి దీన్ని నింపండి." },
+  "dashboard": { "greeting": "నమస్కారం, {name}", "newRecTitle": "పంట సలహా పొందండి", "chatTitle": "ప్రశ్న అడగండి" },
+  "chat": { "title": "AgriGenius ని అడగండి", "newChat": "కొత్త సంభాషణ", "send": "పంపండి", "placeholder": "మీ ప్రశ్న రాయండి…" },
+  "errors": { "INVALID_CREDENTIALS": "మొబైల్ నంబర్ లేదా పాస్‌వర్డ్ సరైనది కాదు." }
+}

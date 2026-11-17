@@ -68,14 +68,17 @@ Other actuator endpoints are not exposed (`401`).
 | Farms | PUT | `/api/farms/{id}` | Update farm | Planned |
 | Soil | POST | `/api/farms/{farmId}/soil` | Add soil record | Planned |
 | Soil | GET | `/api/farms/{farmId}/soil` | List soil records | Planned |
-| Recommendations | POST | `/api/recommendations` | Generate crop options | In progress (M3) |
-| Recommendations | GET | `/api/recommendations/history` | Recommendation history | In progress (M3) |
-| Recommendations | GET | `/api/recommendations/{id}` | One recommendation (owner only) | In progress (M3) |
+| Recommendations | POST | `/api/recommendations` | Generate crop options | Implemented (PR #4) |
+| Recommendations | GET | `/api/recommendations/history` | Recommendation history | Implemented (PR #4) |
+| Recommendations | GET | `/api/recommendations/{id}` | One recommendation (owner only) | Implemented (PR #4) |
 | Weather | GET | `/api/weather/{farmId}` | Farm forecast | Planned |
 | Weather | GET | `/api/weather/alerts` | Accessible alerts | Planned |
-| Chat | POST | `/api/chat/messages` | Send message | Planned |
-| Chat | GET | `/api/chat/sessions` | List sessions | Planned |
-| Chat | GET | `/api/chat/sessions/{id}/messages` | Session messages | Planned |
+| Chat | POST | `/api/chat/sessions` | Start a session | In progress |
+| Chat | GET | `/api/chat/sessions` | List own sessions | In progress |
+| Chat | GET | `/api/chat/sessions/{id}` | One session (owner only) | In progress |
+| Chat | DELETE | `/api/chat/sessions/{id}` | Delete own session and its messages | In progress |
+| Chat | GET | `/api/chat/sessions/{id}/messages` | Session messages | In progress |
+| Chat | POST | `/api/chat/sessions/{id}/messages` | Send a message, get the answer | In progress |
 
 ## Authentication and farmer profile (Milestone 2)
 
@@ -266,6 +269,79 @@ The caller's own recommendations, newest first. `size` is 1–50 (default 20).
 
 Returns the full recommendation in the same shape as the POST response. Another farmer's id, or an unknown id, returns **404 `NOT_FOUND`** (never 403), so ids cannot be probed.
 
+## Agriculture chatbot (in progress; ADR-0006, ADR-0007)
+
+All endpoints require a Bearer token with role `FARMER`. Every query is scoped to the caller: another farmer's session, or an unknown id, returns **404 `NOT_FOUND`**.
+
+| Method | Path | Result |
+|---|---|---|
+| POST | `/api/chat/sessions` | `201` session; body `{"language":"te","title":"Paddy pests"}` (`language` one of `en`, `hi`, `te`, `kn`, `ta`; `title` optional, up to 120 characters) |
+| GET | `/api/chat/sessions?page=0&size=20` | Caller's sessions, newest activity first |
+| GET | `/api/chat/sessions/{id}` | Session details |
+| DELETE | `/api/chat/sessions/{id}` | `204`; deletes the session and all its messages |
+| GET | `/api/chat/sessions/{id}/messages?page=0&size=50` | Messages in chronological order |
+| POST | `/api/chat/sessions/{id}/messages` | Send a message; returns the stored question and the answer |
+
+### `POST /api/chat/sessions/{id}/messages`
+
+```json
+{ "content": "My paddy leaves have brown spots. What could it be?" }
+```
+
+`200 OK`:
+
+```json
+{
+  "userMessage": { "id": "…", "content": "…", "createdAt": "…" },
+  "assistantMessage": {
+    "id": "…", "status": "OK", "language": "te",
+    "content": "… (answer in Telugu) …",
+    "sources": [ { "title": "Rice: Integrated Pest Management", "publisher": "…", "url": "https://…", "licence": "CC-BY-4.0" } ],
+    "toolsUsed": [ "getMyRecentCropRecommendations" ],
+    "uncertainty": "Based on general guidance; confirm with your local KVK before treating your crop.",
+    "createdAt": "…"
+  },
+  "usage": { "remainingMessagesToday": 37 }
+}
+```
+
+**Assistant message status**
+
+| Status | Meaning |
+|---|---|
+| `OK` | Answer grounded in retrieved sources and/or the farmer's own data |
+| `NO_SOURCES` | No knowledge passed the relevance threshold. The bot says it has no verified information and refers the farmer to the local KVK; it doesn't guess. |
+| `REFUSED` | Out of scope (field-specific fertilizer doses, market prices, government-scheme eligibility, live weather) or a model refusal |
+| `FAILED` | The provider failed or timed out. The farmer's message is kept. |
+
+**Limits**
+
+| Limit | Value |
+|---|---|
+| Message length | 1–2,000 characters (control characters stripped) |
+| Messages per session | 200 |
+| Active sessions per farmer | 50 |
+| Messages per farmer | 20 per 10 minutes; 40 per day |
+| Answer length | At most 1,024 output tokens |
+
+**Errors** (problem+json with `code`)
+
+| Status | `code` | When |
+|---|---|---|
+| 400 | `VALIDATION_FAILED` | Invalid content, language, or a limit reached |
+| 401 | `AUTHENTICATION_REQUIRED` | Missing or invalid token |
+| 403 | `ACCESS_DENIED` | Role other than FARMER |
+| 404 | `NOT_FOUND` | Another farmer's session, or an unknown id |
+| 429 | `TOO_MANY_REQUESTS` | 10-minute message limit (with `Retry-After`) |
+| 429 | `CHAT_DAILY_LIMIT_REACHED` | Daily message limit; `Retry-After` = seconds until UTC midnight |
+| 409 | `CHAT_SESSION_LIMIT_REACHED` | Creating a session when 50 sessions are already ACTIVE |
+| 409 | `CHAT_SESSION_FULL` | Sending to a session that already holds 200 messages |
+| 503 | `CHAT_PROVIDER_UNAVAILABLE` | LLM provider down or timed out; the question is kept and a FAILED answer is stored |
+| 503 | `CHAT_BUDGET_EXHAUSTED` | The global daily token budget (`CHAT_DAILY_TOKEN_BUDGET`) is spent |
+| 503 | `CHAT_DISABLED` | No provider configured (`ANTHROPIC_API_KEY` empty) |
+
+**Privacy (decision C7):** the text of chat messages is sent to the LLM provider (Anthropic) to generate answers. Tools never return the farmer's mobile number or email, and message text is never written to logs.
+
 ## Contract conventions to finalize
 - Pagination/sorting format.
 - Refresh-token lifecycle and password recovery (deferred, D1).
@@ -312,3 +388,6 @@ Returns `model-info-response.json`: name, version, SHA-256, data label, feature 
 - `environment` is one of `local`, `test`, `staging`, `production`.
 - This is liveness only. `GET /health/ready` reports readiness: `200` when the crop model is loaded and its SHA-256 verified, `503 {"code":"MODEL_NOT_LOADED"}` otherwise.
 - OpenAPI is served at `/openapi.json` and `/docs` except when `ML_APP_ENV=production` (unless `ML_DOCS_ENABLED=true`).
+
+
+> Chat behaviour note: an answer that cites no retrieved source and used no tool is always returned as `NO_SOURCES` with a fixed referral text (this includes greetings). Sending to an ARCHIVED session returns 404.

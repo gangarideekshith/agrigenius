@@ -1,0 +1,43 @@
+{
+  "_status": "DRAFT - needs native-speaker review",
+  "app": { "tagline": "ನಿಮ್ಮ ಹೊಲಕ್ಕೆ ಸ್ಮಾರ್ಟ್ ನೆರವು" },
+  "nav": {
+    "dashboard": "ಮುಖಪುಟ",
+    "newRecommendation": "ಬೆಳೆ ಸಲಹೆ",
+    "history": "ನನ್ನ ಸಲಹೆಗಳ ಇತಿಹಾಸ",
+    "chat": "AgriGenius ಅನ್ನು ಕೇಳಿ",
+    "logout": "ಸೈನ್ ಔಟ್",
+    "language": "ಭಾಷೆ",
+    "menu": "ಮೆನು"
+  },
+  "common": {
+    "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ…",
+    "retry": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "cancel": "ರದ್ದುಮಾಡಿ",
+    "yes": "ಹೌದು",
+    "no": "ಇಲ್ಲ",
+    "select": "ಆಯ್ಕೆಮಾಡಿ…"
+  },
+  "login": {
+    "title": "ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "mobile": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    "password": "ಪಾಸ್‌ವರ್ಡ್",
+    "submit": "ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    "registerLink": "ಖಾತೆ ರಚಿಸಿ"
+  },
+  "register": {
+    "title": "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ರಚಿಸಿ",
+    "fullName": "ಪೂರ್ಣ ಹೆಸರು",
+    "mobile": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    "password": "ಪಾಸ್‌ವರ್ಡ್",
+    "language": "ಆದ್ಯತೆಯ ಭಾಷೆ",
+    "state": "ರಾಜ್ಯ",
+    "district": "ಜಿಲ್ಲೆ",
+    "village": "ಗ್ರಾಮ",
+    "submit": "ಖಾತೆ ರಚಿಸಿ"
+  },
+  "validation": { "required": "ದಯವಿಟ್ಟು ಇದನ್ನು ಭರ್ತಿ ಮಾಡಿ." },
+  "dashboard": { "greeting": "ನಮಸ್ಕಾರ, {name}", "newRecTitle": "ಬೆಳೆ ಸಲಹೆ ಪಡೆಯಿರಿ", "chatTitle": "ಪ್ರಶ್ನೆ ಕೇಳಿ" },
+  "chat": { "title": "AgriGenius ಅನ್ನು ಕೇಳಿ", "newChat": "ಹೊಸ ಸಂಭಾಷಣೆ", "send": "ಕಳುಹಿಸಿ", "placeholder": "ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಬರೆಯಿರಿ…" },
+  "errors": { "INVALID_CREDENTIALS": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಸರಿಯಿಲ್ಲ." }
+}

@@ -20,11 +20,54 @@
     <properties>
         <java.version>21</java.version>
         <springdoc.version>3.2.0</springdoc.version>
+        <!-- Built against Spring Boot 4.1.2 (ADR-0006). -->
+        <spring-ai.version>2.0.2</spring-ai.version>
+        <!-- Override with -Dsurefire.excludedGroups= (empty) together with -Dgroups=live-llm. -->
+        <surefire.excludedGroups>live-llm</surefire.excludedGroups>
         <!-- Populated by maven-dependency-plugin:properties; used to attach Mockito's agent. -->
         <argLine/>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+        <!-- AI agriculture chatbot (ADR-0006): Claude via the official Anthropic SDK, in-process
+             multilingual embeddings (ONNX), and pgvector retrieval. -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-anthropic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-transformers</artifactId>
+            <!-- Embeddings use our own ONNX Runtime model (knowledge/embedding/OnnxE5EmbeddingModel) with
+                 pooling in plain Java. DJL's PyTorch engine (used only by Spring AI's TransformersEmbeddingModel
+                 for NDArray pooling) would download libtorch native libraries at runtime, so it is excluded. -->
+            <exclusions>
+                <exclusion>
+                    <groupId>ai.djl.pytorch</groupId>
+                    <artifactId>pytorch-engine</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ai.djl</groupId>
+                    <artifactId>model-zoo</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
@@ -130,6 +173,8 @@
                 <configuration>
                     <!-- Load Mockito's inline mock maker as an agent (JDK 21 forbids silent dynamic loading). -->
                     <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
+                    <!-- Live LLM evaluation costs money: run only explicitly with -Dgroups=live-llm (ADR-0006). -->
+                    <excludedGroups>${surefire.excludedGroups}</excludedGroups>
                 </configuration>
             </plugin>
             <plugin>
