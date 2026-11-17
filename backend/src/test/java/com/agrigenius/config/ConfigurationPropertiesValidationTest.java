@@ -29,7 +29,8 @@ class ConfigurationPropertiesValidationTest {
                         "agrigenius.cors.allowed-origins=http://localhost:4200,https://app.example",
                         "agrigenius.ml-service.base-url=http://localhost:8001",
                         "agrigenius.ml-service.connect-timeout=2s",
-                        "agrigenius.ml-service.read-timeout=5s")
+                        "agrigenius.ml-service.read-timeout=5s",
+                        "agrigenius.ml-service.api-key=test-only-internal-api-key-not-a-secret-0001")
                 .run(context -> {
                     assertThat(context).hasNotFailed();
                     assertThat(context.getBean(CorsProperties.class).allowedOrigins())
@@ -44,7 +45,8 @@ class ConfigurationPropertiesValidationTest {
                         "agrigenius.cors.allowed-origins=*",
                         "agrigenius.ml-service.base-url=http://localhost:8001",
                         "agrigenius.ml-service.connect-timeout=2s",
-                        "agrigenius.ml-service.read-timeout=5s")
+                        "agrigenius.ml-service.read-timeout=5s",
+                        "agrigenius.ml-service.api-key=test-only-internal-api-key-not-a-secret-0001")
                 .run(context -> assertThat(context).hasFailed()
                         .getFailure().rootCause().hasMessageContaining("'*' is not allowed"));
     }
@@ -54,7 +56,8 @@ class ConfigurationPropertiesValidationTest {
         runner.withPropertyValues(
                         "agrigenius.cors.allowed-origins=http://localhost:4200",
                         "agrigenius.ml-service.connect-timeout=2s",
-                        "agrigenius.ml-service.read-timeout=5s")
+                        "agrigenius.ml-service.read-timeout=5s",
+                        "agrigenius.ml-service.api-key=test-only-internal-api-key-not-a-secret-0001")
                 .run(context -> assertThat(context).hasFailed()
                         .getFailure().rootCause().hasMessageContaining("baseUrl"));
     }

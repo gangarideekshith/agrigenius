@@ -96,7 +96,8 @@ class RestMlServiceClientTest {
     }
 
     private static MlServiceClient clientFor(URI baseUrl, Duration connectTimeout, Duration readTimeout) {
-        MlServiceProperties properties = new MlServiceProperties(baseUrl, connectTimeout, readTimeout);
+        MlServiceProperties properties = new MlServiceProperties(baseUrl, connectTimeout, readTimeout,
+                "test-only-internal-api-key-not-a-secret-0001");
         RestClient restClient = new MlServiceClientConfig().mlServiceRestClient(RestClient.builder(), properties);
         return new RestMlServiceClient(restClient);
     }

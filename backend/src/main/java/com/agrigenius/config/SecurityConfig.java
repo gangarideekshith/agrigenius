@@ -25,7 +25,8 @@ import tools.jackson.databind.json.JsonMapper;
  * Stateless, deny-by-default security with JWT bearer authentication (ADR-0003).
  *
  * <p>Public: register, login, health/info probes and (local profile) API docs.
- * {@code /api/farmers/**} requires the FARMER role; everything else requires a valid token.
+ * {@code /api/farmers/**} and {@code /api/recommendations/**} require the FARMER role; everything else
+ * requires a valid token.
  * 401/403 are problem+json without revealing why authentication failed.
  */
 @Configuration
@@ -81,6 +82,7 @@ public class SecurityConfig {
                         auth.requestMatchers(API_DOCS).permitAll();
                     }
                     auth.requestMatchers("/api/farmers/**").hasRole("FARMER");
+                    auth.requestMatchers("/api/recommendations", "/api/recommendations/**").hasRole("FARMER");
                     auth.anyRequest().authenticated();
                 });
         return http.build();

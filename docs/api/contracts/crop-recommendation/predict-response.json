@@ -1,0 +1,24 @@
+{
+  "model": {
+    "name": "crop-recommendation-rf",
+    "version": "1.0.0",
+    "sha256": "3f5a1c9e0b7d2a4f6e8c1b3d5f7a9c0e2b4d6f8a1c3e5b7d9f0a2c4e6b8d0f1a",
+    "data_label": "DEMO_PUBLIC_DATASET"
+  },
+  "predictions": [
+    {
+      "crop": "rice",
+      "probability": 0.87,
+      "explanation": [
+        { "feature": "rainfall_mm", "value": 202.94, "p05": 182.6, "p95": 298.6 },
+        { "feature": "humidity_pct", "value": 82.0, "p05": 80.1, "p95": 84.9 }
+      ]
+    },
+    { "crop": "jute", "probability": 0.06, "explanation": [ { "feature": "rainfall_mm", "value": 202.94, "p05": 151.2, "p95": 199.8 } ] },
+    { "crop": "coconut", "probability": 0.03, "explanation": [ { "feature": "humidity_pct", "value": 82.0, "p05": 90.1, "p95": 99.9 } ] },
+    { "crop": "papaya", "probability": 0.02, "explanation": [ { "feature": "temperature_c", "value": 20.88, "p05": 23.4, "p95": 43.1 } ] },
+    { "crop": "maize", "probability": 0.01, "explanation": [ { "feature": "rainfall_mm", "value": 202.94, "p05": 61.4, "p95": 108.9 } ] }
+  ],
+  "warnings": [],
+  "inference_ms": 4
+}

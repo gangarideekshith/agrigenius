@@ -30,3 +30,4 @@ agrigenius:
     base-url: http://127.0.0.1:1
     connect-timeout: 200ms
     read-timeout: 200ms
+    api-key: test-only-internal-api-key-not-a-secret-0001

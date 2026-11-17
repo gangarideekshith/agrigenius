@@ -43,3 +43,6 @@ Thumbs.db
 
 # Claude Code agent worktrees (temporary checkouts)
 .claude/worktrees/
+
+# Trained model artifacts are generated locally/CI from the committed dataset, never committed (ADR-0005).
+ml-service/models/

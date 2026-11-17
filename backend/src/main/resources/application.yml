@@ -118,6 +118,14 @@ agrigenius:
     base-url: ${ML_SERVICE_BASE_URL:http://localhost:8001}
     connect-timeout: ${ML_SERVICE_CONNECT_TIMEOUT:2s}
     read-timeout: ${ML_SERVICE_READ_TIMEOUT:5s}
+    api-key: ${ML_SERVICE_API_KEY}
+  recommendation:
+    # Candidate confidence: HIGH >= high, MEDIUM >= medium, otherwise LOW (decision Q8).
+    confidence:
+      high: 0.60
+      medium: 0.30
+    throttle:
+      per-user-per-hour: 30
 
 logging:
   pattern:

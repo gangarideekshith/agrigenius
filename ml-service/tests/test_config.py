@@ -58,3 +58,34 @@ def test_invalid_values_fail_fast(monkeypatch: pytest.MonkeyPatch, variable: str
 
     with pytest.raises(ValidationError):
         Settings(_env_file=None)
+
+
+def test_internal_api_key_is_required(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("ML_INTERNAL_API_KEY", raising=False)
+
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None)
+
+
+@pytest.mark.parametrize(
+    "key",
+    ["too-short", "REPLACE_WITH_BASE64_OF_48_RANDOM_BYTES_PLACEHOLDER"],
+)
+def test_weak_or_placeholder_api_key_is_rejected(monkeypatch: pytest.MonkeyPatch, key: str):
+    monkeypatch.setenv("ML_INTERNAL_API_KEY", key)
+
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None)
+
+
+def test_api_key_is_never_shown_in_repr():
+    settings = Settings(_env_file=None)
+
+    assert settings.internal_api_key.get_secret_value() not in repr(settings)
+    assert settings.internal_api_key.get_secret_value() not in str(settings.model_dump())
+
+
+@pytest.mark.parametrize("version", ["../1.0.0", "1.0", "latest", "1.0.0/../../etc"])
+def test_model_version_must_be_semantic_version(version: str):
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, crop_model_version=version)

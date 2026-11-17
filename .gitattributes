@@ -9,3 +9,5 @@ mvnw text eol=lf
 *.html text eol=lf
 *.json text eol=lf
 *.md text eol=lf
+# Datasets are checksummed byte-for-byte; never convert line endings.
+*.csv -text
