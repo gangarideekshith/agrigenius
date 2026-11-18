@@ -48,7 +48,7 @@ class ApplicationIntegrationTest implements PostgresTestcontainer {
         java.util.List<String> applied = jdbcTemplate.queryForList(
                 "select version from flyway_schema_history where success and version is not null order by installed_rank",
                 String.class);
-        assertThat(applied).containsExactly("1", "2", "3", "4");
+        assertThat(applied).containsExactly("1", "2", "3", "4", "5");
 
         String vectorVersion = jdbcTemplate.queryForObject(
                 "select extversion from pg_extension where extname = 'vector'", String.class);
@@ -61,7 +61,8 @@ class ApplicationIntegrationTest implements PostgresTestcontainer {
                 """, String.class);
         assertThat(appTables).containsExactly(
                 "chat_messages", "chat_sessions", "chat_usage_daily", "crop_recommendation_requests",
-                "crop_recommendation_results", "crops", "farmer_profiles", "knowledge_chunks", "knowledge_documents", "users");
+                "crop_recommendation_results", "crops", "farmer_profiles", "knowledge_chunks", "knowledge_documents",
+                "notifications", "reminders", "users");
     }
 
     @Test

@@ -14,7 +14,8 @@
     "language": "Language",
     "menu": "Menu",
     "mainNavigation": "Main navigation",
-    "profile": "My profile"
+    "profile": "My profile",
+    "reminders": "Reminders"
   },
   "common": {
     "loading": "Loading…",
@@ -107,7 +108,16 @@
     "latestRecTitle": "Your latest crop advice",
     "latestRecEmpty": "You have not asked for crop advice yet.",
     "latestRecOpen": "View details",
-    "latestRecError": "Your latest crop advice could not be loaded."
+    "latestRecError": "Your latest crop advice could not be loaded.",
+    "remindersTitle": "Farm reminders",
+    "remindersError": "Your reminders could not be loaded right now.",
+    "remindersOverdue": "{count} overdue",
+    "remindersToday": "{count} due today",
+    "remindersUpcoming": "{count} in the next {days} days",
+    "remindersNoneToday": "Nothing planned for today.",
+    "remindersOpen": "All reminders",
+    "remindersTileTitle": "Reminders",
+    "remindersTileText": "Plan watering, spraying, sowing and harvest so nothing is missed."
   },
   "rec": {
     "newTitle": "Get crop advice",
@@ -277,7 +287,14 @@
     "SERVICE_UNAVAILABLE": "The service is not available right now. Please try again soon.",
     "NETWORK_ERROR": "Cannot reach AgriGenius. Check your internet connection.",
     "INTERNAL_ERROR": "Something went wrong on our side.",
-    "UNKNOWN_ERROR": "Something went wrong. Please try again."
+    "UNKNOWN_ERROR": "Something went wrong. Please try again.",
+    "REMINDER_IN_PAST": "This date and time has already passed. Please choose a time in the future.",
+    "REMINDER_TOO_FAR_AHEAD": "This date is too far ahead. Please choose a date within the next 3 years.",
+    "INVALID_TIME_ZONE": "Your device time zone is not supported. Please check your device settings.",
+    "INVALID_DATE_RANGE": "The \"From\" date must be on or before the \"To\" date.",
+    "REMINDER_NOT_EDITABLE": "Only pending reminders can be edited. Reopen this reminder first.",
+    "REMINDER_INVALID_STATE": "This action is not possible for this reminder right now. Reopen it first.",
+    "REMINDER_LIMIT_REACHED": "You have too many pending reminders. Complete or delete some first."
   },
   "profile": {
     "title": "My profile",
@@ -296,5 +313,117 @@
     "temperatureC": "Temperature (°C)",
     "humidityPct": "Humidity (%)",
     "rainfallMm": "Rainfall (mm)"
+  },
+  "reminders": {
+    "title": "Farm reminders",
+    "intro": "Plan your farm work. When a reminder is due it appears under the bell at the top while AgriGenius is open.",
+    "new": "New reminder",
+    "newTitle": "New reminder",
+    "editTitle": "Edit reminder",
+    "statsTitle": "Reminder counts",
+    "statsError": "Counts could not be loaded right now.",
+    "viewsLabel": "Show reminders",
+    "views": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "upcoming": "Upcoming",
+      "pending": "Pending",
+      "completed": "Completed",
+      "all": "All"
+    },
+    "stats": {
+      "dueToday": "Due today",
+      "upcoming": "Next {days} days"
+    },
+    "filters": {
+      "search": "Search title, crop or notes",
+      "any": "Any",
+      "from": "From date",
+      "to": "To date",
+      "clear": "Clear",
+      "apply": "Apply filters"
+    },
+    "fields": {
+      "title": "What needs to be done?",
+      "category": "Type of work",
+      "status": "Status",
+      "priority": "Priority",
+      "crop": "Crop",
+      "date": "Date",
+      "time": "Time",
+      "description": "Notes",
+      "when": "When",
+      "completedAt": "Completed on",
+      "notifiedAt": "Alert shown on",
+      "createdAt": "Created on"
+    },
+    "empty": {
+      "overdue": "No overdue reminders. Well done!",
+      "today": "No reminders for today.",
+      "upcoming": "No reminders in the next 7 days.",
+      "pending": "No pending reminders.",
+      "completed": "No completed reminders yet.",
+      "all": "No reminders match. Try clearing the filters."
+    },
+    "categories": {
+      "IRRIGATION": "Irrigation / watering",
+      "FERTILIZER": "Fertilizer",
+      "PESTICIDE": "Pesticide spraying",
+      "WEEDING": "Weed management",
+      "CROP_INSPECTION": "Crop inspection",
+      "SOIL_TESTING": "Soil testing",
+      "HARVESTING": "Harvesting",
+      "SOWING": "Sowing / planting",
+      "GENERAL": "General",
+      "CUSTOM": "Other"
+    },
+    "statuses": {
+      "PENDING": "Pending",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "priorities": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High"
+    },
+    "priorityLabel": "{priority} priority",
+    "overdue": "Overdue",
+    "overdueNotice": "The time for this reminder has passed. Mark it done, or edit it to choose a new time.",
+    "markDone": "Mark done",
+    "edit": "Edit",
+    "reopen": "Reopen",
+    "cancelReminder": "Cancel reminder",
+    "confirmDelete": "Delete this reminder? This cannot be undone.",
+    "confirmDeleteYes": "Yes, delete",
+    "done": {
+      "complete": "\"{title}\" marked as done.",
+      "reopen": "\"{title}\" is pending again.",
+      "cancel": "\"{title}\" was cancelled.",
+      "delete": "\"{title}\" was deleted."
+    },
+    "backToList": "All reminders",
+    "backToReminder": "Back to reminder",
+    "titlePlaceholder": "For example: Water the paddy field",
+    "cropPlaceholder": "For example: Rice",
+    "timeZoneHelp": "Date and time are in your local time ({zone}).",
+    "save": "Save reminder",
+    "saving": "Saving…",
+    "saved": "Reminder saved."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bellLabel": "Notifications, {count} unread",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark read",
+    "unread": "Unread",
+    "empty": "No notifications yet. Due reminders will appear here.",
+    "dueAt": "Due {time}",
+    "reminderDue": "A farm reminder is due.",
+    "allReminders": "Open reminders",
+    "browserEnable": "Turn on device alerts",
+    "browserDisable": "Turn off device alerts",
+    "browserDenied": "Device alerts are blocked in your browser settings.",
+    "openAppNote": "Alerts appear only while AgriGenius is open in your browser. Nothing rings when the browser is closed."
   }
 }

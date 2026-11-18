@@ -108,6 +108,16 @@ cd backend; ./mvnw spring-boot:run "-Dspring-boot.run.profiles=local,ingest"
 
 Live-model tests are **opt-in** (JUnit tag `live-llm`), excluded from `./mvnw verify` and CI, need `ANTHROPIC_API_KEY`, and **cost money** (about $1 approved for the first spike and evaluation, decision C8). Run them only with the owner's approval.
 
+### Reminders scheduler (optional overrides)
+
+The due-reminder scanner runs inside the backend; no extra service or secret is needed (details: `docs/AGRI_GENIUS_ALARM_SYSTEM.md`).
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `REMINDER_SCANNER_ENABLED` | `true` | Turns the scheduled due-reminder scan on or off (tests turn it off) |
+| `REMINDER_SCAN_INTERVAL` | `PT1M` | Delay between scans (ISO-8601 duration) |
+| `REMINDER_DEFAULT_TIME_ZONE` | `Asia/Kolkata` | Zone used when a request has no `timeZone` |
+
 ### ML service (`ml-service/.env.example`)
 
 Consumed by `ml-service/app/core/config.py`. All use the `ML_` prefix and are validated at startup.

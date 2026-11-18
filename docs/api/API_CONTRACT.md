@@ -355,6 +355,20 @@ All endpoints require a Bearer token with role `FARMER`. Every query is scoped t
 
 **Privacy (decision C7):** the text of chat messages is sent to the LLM provider (Anthropic) to generate answers. Tools never return the farmer's mobile number or email, and message text is never written to logs.
 
+## Reminders and notifications (alarm & reminder system)
+
+Full details, DTOs and error codes: `docs/AGRI_GENIUS_ALARM_SYSTEM.md` §3. All endpoints are FARMER-only and owner-scoped; another farmer's id returns 404.
+
+| Method & path | Purpose |
+|---|---|
+| `POST /api/reminders` | Create (201); `scheduledDate` + `scheduledTime` local to `timeZone` (IANA, default `Asia/Kolkata`); past times → 400 `REMINDER_IN_PAST` |
+| `GET /api/reminders` | Paged list, filters `status`, `category`, `from`, `to` (inclusive local dates), `q`, `timeZone` |
+| `GET/PUT/DELETE /api/reminders/{id}` | Read / replace (PENDING only, else 409 `REMINDER_NOT_EDITABLE`) / delete (204) |
+| `POST /api/reminders/{id}/complete` · `/cancel` · `/reopen` | State changes (409 `REMINDER_INVALID_STATE` when not allowed) |
+| `GET /api/reminders/today` · `/upcoming?days` · `/overdue` · `/summary` | Dashboard views and counts |
+| `GET /api/notifications` · `/unread-count` | In-app notifications (newest first) and the unread badge count |
+| `POST /api/notifications/{id}/read` · `/read-all` | Mark read |
+
 ## Contract conventions to finalize
 - Pagination/sorting format.
 - Refresh-token lifecycle and password recovery (deferred, D1).

@@ -31,3 +31,7 @@ agrigenius:
     connect-timeout: 200ms
     read-timeout: 200ms
     api-key: test-only-internal-api-key-not-a-secret-0001
+  reminders:
+    scanner:
+      # Tests call ReminderDueService directly; no background scheduler.
+      enabled: false
