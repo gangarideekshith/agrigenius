@@ -47,6 +47,30 @@ export const routes: Routes = [
     title: 'Crop advice result · AgriGenius',
   },
   {
+    path: 'reminders',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/reminders/reminders').then((m) => m.RemindersPage),
+    title: 'Reminders · AgriGenius',
+  },
+  {
+    path: 'reminders/new',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/reminders/reminder-form').then((m) => m.ReminderFormPage),
+    title: 'New reminder · AgriGenius',
+  },
+  {
+    path: 'reminders/:id/edit',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/reminders/reminder-form').then((m) => m.ReminderFormPage),
+    title: 'Edit reminder · AgriGenius',
+  },
+  {
+    path: 'reminders/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/reminders/reminder-detail').then((m) => m.ReminderDetailPage),
+    title: 'Reminder · AgriGenius',
+  },
+  {
     path: 'chat',
     canActivate: [authGuard],
     loadComponent: () => import('./features/chat/chat').then((m) => m.ChatPage),

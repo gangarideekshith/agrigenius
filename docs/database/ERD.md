@@ -21,6 +21,8 @@ erDiagram
     USERS ||--o{ CHAT_SESSIONS : starts
     CHAT_SESSIONS ||--o{ CHAT_MESSAGES : contains
     USERS ||--o{ NOTIFICATIONS : receives
+    USERS ||--o{ REMINDERS : plans
+    REMINDERS ||--o{ NOTIFICATIONS : triggers
     FARMS ||--o{ IRRIGATION_RECORDS : logs
     MANDIS ||--o{ MARKET_PRICES : reports
     USERS ||--o{ MARKETPLACE_LISTINGS : creates
@@ -28,7 +30,7 @@ erDiagram
 ```
 
 ## Entity inventory
-users, farmer_profiles, farms, farm_locations, soil_details, soil_test_reports, crops, crop_recommendations, crop_cycles, farm_tasks, weather_records, weather_alerts, market_prices, mandis, disease_reports, irrigation_records, chat_sessions, chat_messages, notifications, expenses, harvest_records, government_schemes, marketplace_listings, buyers, orders, audit_logs.
+users, farmer_profiles, farms, farm_locations, soil_details, soil_test_reports, crops, crop_recommendations, crop_cycles, farm_tasks, weather_records, weather_alerts, market_prices, mandis, disease_reports, irrigation_records, chat_sessions, chat_messages, reminders, notifications, expenses, harvest_records, government_schemes, marketplace_listings, buyers, orders, audit_logs.
 
 ## Rules
 - A farmer can own multiple farms.
@@ -37,6 +39,7 @@ users, farmer_profiles, farms, farm_locations, soil_details, soil_test_reports, 
 - A crop cycle can have multiple expenses and harvest records.
 - A farmer can have multiple chat sessions and a session multiple messages.
 - A farm can have multiple weather alerts.
+- A farmer can have many reminders (V5, implemented); each due reminder time creates at most one notification (`UNIQUE (reminder_id, scheduled_for)`). Deleting a reminder or user deletes its notifications. See `docs/AGRI_GENIUS_ALARM_SYSTEM.md` §2.
 - Store coordinates per farm location.
 - Use Flyway migrations; never rely on Hibernate auto-DDL for production schema changes.
 

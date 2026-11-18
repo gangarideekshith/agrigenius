@@ -160,3 +160,87 @@ export const CROP_CODES: readonly string[] = [
   'lentil', 'maize', 'mango', 'mothbeans', 'mungbean', 'muskmelon', 'orange', 'papaya', 'pigeonpeas',
   'pomegranate', 'rice', 'watermelon',
 ];
+
+/* ---------- Reminders and notifications (docs/AGRI_GENIUS_ALARM_SYSTEM.md) ---------- */
+
+export type ReminderCategory =
+  | 'IRRIGATION'
+  | 'FERTILIZER'
+  | 'PESTICIDE'
+  | 'WEEDING'
+  | 'CROP_INSPECTION'
+  | 'SOIL_TESTING'
+  | 'HARVESTING'
+  | 'SOWING'
+  | 'GENERAL'
+  | 'CUSTOM';
+export const REMINDER_CATEGORIES: readonly ReminderCategory[] = [
+  'IRRIGATION', 'FERTILIZER', 'PESTICIDE', 'WEEDING', 'CROP_INSPECTION',
+  'SOIL_TESTING', 'HARVESTING', 'SOWING', 'GENERAL', 'CUSTOM',
+];
+export type ReminderStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED';
+export const REMINDER_STATUSES: readonly ReminderStatus[] = ['PENDING', 'COMPLETED', 'CANCELLED'];
+export type ReminderPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+export const REMINDER_PRIORITIES: readonly ReminderPriority[] = ['LOW', 'MEDIUM', 'HIGH'];
+
+/** POST/PUT body. Date (YYYY-MM-DD) and time (HH:mm) are local to timeZone (IANA id). */
+export interface ReminderRequest {
+  title: string;
+  description: string | null;
+  category: ReminderCategory;
+  cropName: string | null;
+  scheduledDate: string;
+  scheduledTime: string;
+  timeZone: string;
+  priority: ReminderPriority;
+}
+
+export interface Reminder {
+  id: string;
+  title: string;
+  description: string | null;
+  category: ReminderCategory;
+  cropName: string | null;
+  /** UTC instant of scheduledDate + scheduledTime in timeZone. */
+  scheduledAt: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  timeZone: string;
+  status: ReminderStatus;
+  priority: ReminderPriority;
+  overdue: boolean;
+  notifiedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReminderSummary {
+  pending: number;
+  overdue: number;
+  dueToday: number;
+  upcoming: number;
+  upcomingDays: number;
+  completed: number;
+  cancelled: number;
+}
+
+export interface ReminderListFilter {
+  status?: ReminderStatus | null;
+  category?: ReminderCategory | null;
+  from?: string | null;
+  to?: string | null;
+  q?: string | null;
+}
+
+export interface AppNotification {
+  id: string;
+  type: 'REMINDER_DUE';
+  title: string;
+  body: string | null;
+  reminderId: string | null;
+  scheduledFor: string | null;
+  createdAt: string;
+  read: boolean;
+  readAt: string | null;
+}

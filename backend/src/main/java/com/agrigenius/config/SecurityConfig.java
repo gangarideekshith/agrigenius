@@ -84,6 +84,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/farmers/**").hasRole("FARMER");
                     auth.requestMatchers("/api/recommendations", "/api/recommendations/**").hasRole("FARMER");
                     auth.requestMatchers("/api/chat/**").hasRole("FARMER");
+                    auth.requestMatchers("/api/reminders", "/api/reminders/**").hasRole("FARMER");
+                    auth.requestMatchers("/api/notifications", "/api/notifications/**").hasRole("FARMER");
                     auth.anyRequest().authenticated();
                 });
         return http.build();

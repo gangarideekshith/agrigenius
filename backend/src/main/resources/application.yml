@@ -161,6 +161,20 @@ agrigenius:
     max-messages-per-session: 200
     max-active-sessions: 50
     provider-timeout: 60s
+  reminders:
+    # Reminder system (docs/AGRI_GENIUS_ALARM_SYSTEM.md).
+    default-time-zone: ${REMINDER_DEFAULT_TIME_ZONE:Asia/Kolkata}
+    max-pending-per-farmer: 500
+    max-days-ahead: 1095          # about 3 years
+    past-grace: 2m                # tolerate small clock differences when "now" is picked
+    upcoming-default-days: 7
+    upcoming-max-days: 60
+    list-limit: 100               # max items returned by /today, /upcoming and /overdue
+    scanner:
+      enabled: ${REMINDER_SCANNER_ENABLED:true}
+      interval: ${REMINDER_SCAN_INTERVAL:PT1M}
+      batch-size: 200
+      max-batches-per-run: 20
   knowledge:
     top-k: 5
     similarity-threshold: ${CHAT_SIMILARITY_THRESHOLD:0.75}   # provisional; tuned on the gold set

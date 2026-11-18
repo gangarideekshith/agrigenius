@@ -148,6 +148,13 @@
 - Browser journey on the real stack (ML :8001, backend :8081 with the owner's `.env`, UI :4200; DB backed up first): register → login → dashboard → profile edit saved (verified in DB) → crop advice from the real model (rice 93.7 % HIGH) → chat session created → send answered CHAT_DISABLED (no API key, nothing stored) → session deleted. Test account removed afterwards.
 - Handoff and Stage 2/3 plan: `docs/AGRI_GENIUS_FUTURE_ROADMAP.md`.
 
+## Alarm & reminder system (2026-11-18, branch `feature/reminders`, not committed)
+
+- Explicitly requested by the owner; it overlaps the Phase 2 "crop lifecycle/tasks" area and is built as standalone farmer reminders (no Phase 2 module started).
+- Backend: Flyway V5 (`reminders`, `notifications`), `reminder` and `notification` modules, reminder CRUD + complete/cancel/reopen + today/upcoming/overdue/summary, notification list/unread-count/read/read-all, scheduled due-reminder scanner (`FOR UPDATE SKIP LOCKED`, idempotent insert, restart catch-up).
+- Frontend: `/reminders` dashboard with counts, tabs and filters, create/edit form, detail page, header notification bell (60 s polling, optional browser alerts while the app is open), dashboard card.
+- Evidence and limitations: `docs/AGRI_GENIUS_ALARM_SYSTEM.md` (no alerts while the browser is closed; no recurrence; English strings only).
+
 ## Blockers and decisions needed
 - ~~Dataset licence~~ Resolved 2026-11-17: Apache 2.0 (Kaggle metadata); dataset committed with NOTICE and checksum; model 1.0.0 trained (artifact generated, not committed).
 - ~~Service-to-service authentication~~ Done in M3 (ADR-0004 implemented: shared `X-Internal-Api-Key`, constant-time check, loopback binding).

@@ -1,16 +1,18 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { asApiError } from '../../core/api/api-error';
-import { FarmerApi, RecommendationApi } from '../../core/api/api.services';
+import { FarmerApi, RecommendationApi, ReminderApi } from '../../core/api/api.services';
 import { ErrorView, describeError } from '../../core/api/error-message';
-import { FarmerProfile, RecommendationSummary } from '../../core/api/models';
+import { FarmerProfile, RecommendationSummary, Reminder, ReminderSummary } from '../../core/api/models';
 import { I18nService, TranslatePipe } from '../../core/i18n/i18n.service';
 import { ErrorBanner, Loading } from '../../shared/state-views';
+import { FarmTimePipe, browserTimeZone } from '../reminders/reminder-utils';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, DatePipe, TranslatePipe, Loading, ErrorBanner],
+  imports: [RouterLink, DatePipe, TranslatePipe, Loading, ErrorBanner, FarmTimePipe],
   template: `
     @if (loading()) {
       <app-loading />
@@ -29,6 +31,45 @@ import { ErrorBanner, Loading } from '../../shared/state-views';
           <div><dt>{{ 'dashboard.memberSince' | t }}</dt><dd>{{ p.createdAt | date: 'mediumDate' }}</dd></div>
         </dl>
         <a class="btn btn-secondary" routerLink="/profile">{{ 'dashboard.editProfile' | t }}</a>
+      </section>
+
+      <section class="card" aria-labelledby="reminders-title">
+        <h2 id="reminders-title">{{ 'dashboard.remindersTitle' | t }}</h2>
+        @if (remindersLoading()) {
+          <app-loading />
+        } @else if (remindersError()) {
+          <p class="state state-error" role="alert">{{ 'dashboard.remindersError' | t }}</p>
+        } @else if (reminderSummary(); as s) {
+          <p>
+            @if (s.overdue > 0) {
+              <a class="chip chip-overdue" routerLink="/reminders" [queryParams]="{ view: 'overdue' }">
+                {{ 'dashboard.remindersOverdue' | t: { count: s.overdue } }}
+              </a>
+            }
+            <a class="chip" routerLink="/reminders" [queryParams]="{ view: 'today' }">{{ 'dashboard.remindersToday' | t: { count: s.dueToday } }}</a>
+            <a class="chip" routerLink="/reminders" [queryParams]="{ view: 'upcoming' }">
+              {{ 'dashboard.remindersUpcoming' | t: { count: s.upcoming, days: s.upcomingDays } }}
+            </a>
+          </p>
+          @if (todayReminders().length > 0) {
+            <ul class="compact-list">
+              @for (r of todayReminders(); track r.id) {
+                <li [class.is-done]="r.status !== 'PENDING'">
+                  <a [routerLink]="['/reminders', r.id]">{{ r.title }}</a>
+                  <span class="muted small"> · {{ r.scheduledAt | farmTime: r.timeZone }}</span>
+                  @if (r.status === 'COMPLETED') { <span class="small"> · ✓ {{ 'reminders.statuses.COMPLETED' | t }}</span> }
+                  @else if (r.overdue) { <span class="chip chip-overdue">{{ 'reminders.overdue' | t }}</span> }
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="state state-empty">{{ 'dashboard.remindersNoneToday' | t }}</p>
+          }
+          <div class="actions actions-start">
+            <a class="btn btn-primary" routerLink="/reminders/new">{{ 'reminders.new' | t }}</a>
+            <a class="btn btn-secondary" routerLink="/reminders">{{ 'dashboard.remindersOpen' | t }}</a>
+          </div>
+        }
       </section>
 
       <section class="card" aria-labelledby="latest-rec-title">
@@ -61,6 +102,11 @@ import { ErrorBanner, Loading } from '../../shared/state-views';
           <strong>{{ 'dashboard.historyTitle' | t }}</strong>
           <span>{{ 'dashboard.historyText' | t }}</span>
         </a>
+        <a class="tile" routerLink="/reminders">
+          <span class="tile-icon" aria-hidden="true">⏰</span>
+          <strong>{{ 'dashboard.remindersTileTitle' | t }}</strong>
+          <span>{{ 'dashboard.remindersTileText' | t }}</span>
+        </a>
         <a class="tile" routerLink="/chat">
           <span class="tile-icon" aria-hidden="true">💬</span>
           <strong>{{ 'dashboard.chatTitle' | t }}</strong>
@@ -74,6 +120,7 @@ export class DashboardPage implements OnInit {
   private readonly farmers = inject(FarmerApi);
   private readonly recommendations = inject(RecommendationApi);
   private readonly i18n = inject(I18nService);
+  private readonly reminders = inject(ReminderApi);
 
   readonly profile = signal<FarmerProfile | null>(null);
   readonly loading = signal(true);
@@ -81,10 +128,33 @@ export class DashboardPage implements OnInit {
   readonly latest = signal<RecommendationSummary | null>(null);
   readonly latestLoading = signal(true);
   readonly latestError = signal(false);
+  readonly reminderSummary = signal<ReminderSummary | null>(null);
+  readonly todayReminders = signal<Reminder[]>([]);
+  readonly remindersLoading = signal(true);
+  readonly remindersError = signal(false);
 
   ngOnInit(): void {
     this.load();
     this.loadLatest();
+    this.loadReminders();
+  }
+
+  /** Reminder counts plus today's reminders (real reminder APIs, browser time zone). */
+  loadReminders(): void {
+    const timeZone = browserTimeZone();
+    this.remindersLoading.set(true);
+    this.remindersError.set(false);
+    forkJoin({ summary: this.reminders.summary(timeZone), today: this.reminders.today(timeZone) }).subscribe({
+      next: ({ summary, today }) => {
+        this.reminderSummary.set(summary);
+        this.todayReminders.set(today.slice(0, 5));
+        this.remindersLoading.set(false);
+      },
+      error: () => {
+        this.remindersError.set(true);
+        this.remindersLoading.set(false);
+      },
+    });
   }
 
   /** Most recent crop recommendation (real history API, page size 1). */
